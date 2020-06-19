@@ -1,0 +1,7 @@
+{
+  "name": "QuizMagnet",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
