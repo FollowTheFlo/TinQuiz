@@ -1,5 +1,3 @@
-//import "rxjs/add/observable/from";
-//import { Observable } from "rxjs/Observable";
 import { from } from 'rxjs';
 import { Geolocation } from '@ionic-native/geolocation';
 import { map } from 'rxjs/operators';

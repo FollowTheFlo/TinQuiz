@@ -11,10 +11,11 @@ CLEAR_QWANT_ERROR,
 } from "./../constants";
 
 import {
-    Action,
     StartQwantSearchAction,
     EndQwantSearchAction
-  } from "./../actions";
+  } from "./../actions/qwantActions";
+
+import { Action } from './../actions';
 
   export interface QwantState {
     qwantArticles: QwantArticle[];

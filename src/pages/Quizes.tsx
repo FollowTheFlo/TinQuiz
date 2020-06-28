@@ -9,7 +9,7 @@ import useGlobal from '../store';
 import { MyState, MyAssociatedActions} from './../store'
 
 
-import { ActionCreators } from './../redux/actions'
+import  ActionCreators  from './../redux/actions'
 
 const Quizes: React.FC = () => {
 

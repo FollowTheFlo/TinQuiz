@@ -1,5 +1,5 @@
 import {createStore, compose, applyMiddleware} from 'redux';
-import {qwantEpic, locationEpic} from './epic'
+import AllEpics from './epics'
 import { createEpicMiddleware, combineEpics } from 'redux-observable'
 import reducers, { RootState } from "./reducers";
 
@@ -22,11 +22,7 @@ export interface QwantArticle {
 
 export function makeStore(initialState?: RootState) {
   console.log('initialState', initialState);
-  const epics = combineEpics(
-
-    qwantEpic,
-    locationEpic
-  );
+  const epics = AllEpics;
 
   const observableMiddleware = createEpicMiddleware();
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

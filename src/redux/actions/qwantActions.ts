@@ -1,8 +1,6 @@
-import { QwantArticle } from './store';
-import { Location } from './reducers/GeoReducer';
+import { QwantArticle } from './../store';
 import{
-  START_LOCATION,
-  END_LOCATION,
+
   START_QWANT_SEARCH,
   END_QWANT_SEARCH,
   QWANT_SELECT,
@@ -10,9 +8,8 @@ import{
   CHANGE_PROXY,
   SHOW_QWANT_ERROR,
   CLEAR_QWANT_ERROR,
-  SHOW_GEO_ERROR,
-  CLEAR_GEO_ERROR,
-  } from "./constants";
+
+  } from "./../constants";
 
 
   export interface Coordinates {
@@ -21,7 +18,7 @@ import{
   }
 
   //---------Generic Action
-  export interface Action {
+  interface Action {
     type: string;
     payload?: {};
     params?: {};
@@ -52,16 +49,15 @@ import{
           location: Location;
   }
 
-  export const ActionCreators = {
+  const ActionCreators = {
     endQwantSearch: (payload: EndQwantSearchPayload) => ({ type: END_QWANT_SEARCH, payload: payload}),
     startQwantSearch: (params: StartQwantSearchParams ) => ({ type: START_QWANT_SEARCH, params: params }),
     deleteQwantArticle: (payload: string ) => ({ type: QWANT_DELETE, payload: payload }),
     selectQwantArticle: (payload: string ) => ({ type: QWANT_SELECT, payload: payload }),
-    startLocation: () => ({ type: START_LOCATION}),   
-    endLocation: (payload: EndLocationPayload) => ({ type: END_LOCATION,payload: payload}),
     showQwantErrorMessage: (payload: string ) => ({ type: SHOW_QWANT_ERROR, payload: payload }),
     clearQwantErrorMessage: () => ({ type: CLEAR_QWANT_ERROR}),
-    showGeoErrorMessage: (payload: string ) => ({ type: SHOW_GEO_ERROR, payload: payload }),
-    clearGeoErrorMessage: () => ({ type: CLEAR_GEO_ERROR}),
     changeProxyActivation: (payload: boolean) => ({ type: CHANGE_PROXY, payload: payload}),
+
   }
+
+  export default ActionCreators;

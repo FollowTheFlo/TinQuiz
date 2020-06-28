@@ -1,9 +1,6 @@
 //import { Location} from './../store';
-import {
-  Action,
-  EndLocationAction,
-} from "../actions";
-
+import { Action } from "../actions";
+import { EndLocationAction } from './../actions/geoActions'
 import{
   START_LOCATION,
   END_LOCATION,
@@ -14,7 +11,11 @@ import{
 export interface Location {
   id: string;
   place: string;
-  country: string
+  region: string;
+  country: string;
+  placeWD: string;
+  regionWD: string;
+  countryWD: string;
   lat: number;
   lng: number;
 };
@@ -26,10 +27,17 @@ export interface GeoState {
     loading: boolean,
 }
 
-
 const initialState = {  
     errorMessage: '',
-    location: {id:'0',place:'Saint-James',country:'France', lat:0, lng:0},
+    location: {id:'0',
+    place:'Saint-James',
+    region:'Manche',
+    country:'France',
+    placeWD:'Q478259',
+    regionWD:'Q12589',
+    countryWD:'Q142',
+    lat:-1.325183,
+    lng:48.523252},
     loading: false,
     
 };
