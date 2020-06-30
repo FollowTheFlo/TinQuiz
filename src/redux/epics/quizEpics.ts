@@ -1,10 +1,12 @@
 import { ofType, Epic } from 'redux-observable';
 import { map, catchError, tap, switchMap, mergeMap, concatMap, delay } from 'rxjs/operators';
 import ActionCreators, { Action } from '../actions';
-import { RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST } from '../constants';
+import { RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST,
+    QUESTIONS_MAP
+} from '../constants';
 import { RunQuestionAction, QuestionParams, RunDistractorAction } from '../actions/quizActions';
 import { getSparqlCountryList, getSparqlRegionList, getSparqlPlaceList } from '../shared/services/distractorSPARQL';
-import { RootState } from '../reducers';
+import { questionMainList } from '../shared/config/queriesLists';
 import { from, of } from 'rxjs';
 import { getSparqlChoice, Article } from '../shared/services/questionSPARQL';
 import { getSparqlFilmChoice } from '../shared/services/filmSPARQL';
@@ -79,19 +81,7 @@ interface localQuestionParams extends QuestionParams {
     area: string;
     correctArea: string;
 }
-const questionMap:any = {
-    'musicianByCountry' : 'Musician from',
-    'personByRegion' : 'Person from',
-    'filmByCountry' : 'Film from a Director of',
-    'personByCountry' : 'Person from',
-    'animalByCountry' : 'animal from ',
-    'riverByCountry' : 'River from',
-    'footballerByCountry' : 'Footballer born in',
-    'actorByCountry' : 'Actor from',
-    'bandByCountry' : 'Music band from',
-    'place' : 'is it',
-    'dishByCountry' : 'Dish from',
-}
+
         export const questionEpic: Epic<Action> = (
             action$, state$
             ) =>{
@@ -130,7 +120,7 @@ const questionMap:any = {
                     id: Date.now().toString(),
                     geoType: actionParams.type,
                     theme: actionParams.theme,
-                    phrase: `${questionMap[actionParams.theme]} ${actionParams.area} ?`,
+                    phrase: `${QUESTIONS_MAP[actionParams.theme]} ${actionParams.area} ?`,
                     subPhrase: state$.value.quiz.quiz.location[actionParams.type],
                     correct: actionParams.isDistractor ? false : true,
                     correctArea: actionParams.correctArea,
@@ -146,121 +136,19 @@ const questionMap:any = {
             export const runQuestionListEpic: Epic<Action> = (
                 action$, state$
                 ) =>{
-                    const questionList = [
-                        {
-                            theme: 'place',
-                            type: 'place',
-                            isDistractor: false,
-                          },
-                         
-                          {
-                            theme: 'bandByCountry',
-                            type: 'country',
-                            isDistractor: false,
-                          },
-                          {
-                            theme: 'riverByCountry',
-                            type: 'country',
-                            isDistractor: true,
-                          },
-                          {
-                            theme: 'actorByCountry',
-                            type: 'country',
-                            isDistractor: true,
-                          },
-                          {
-                            theme: 'animalByCountry',
-                            type: 'country',
-                            isDistractor: false,
-                          },
-                          {
-                            theme: 'personByCountry',
-                            type: 'country',
-                            isDistractor: true,
-                          },
-                          {
-                            theme: 'actorByCountry',
-                            type: 'country',
-                            isDistractor: false,
-                          },
-                          {
-                            theme: 'musicianByCountry',
-                            type: 'country',
-                            isDistractor: false,
-                          },
-                          {
-                            theme: 'filmByCountry',
-                            type: 'country',
-                            isDistractor: false,
-                          },
-                          {
-                            theme: 'filmByCountry',
-                            type: 'country',
-                            isDistractor: true,
-                          },
-                          {
-                            theme: 'footballerByCountry',
-                            type: 'country',
-                            isDistractor: true,
-                          },
-                          {
-                            theme: 'footballerByCountry',
-                            type: 'country',
-                            isDistractor: false,
-                          },
-                          {
-                            theme: 'dishByCountry',
-                            type: 'country',
-                            isDistractor: false,
-                          },
-                          {
-                            theme: 'dishByCountry',
-                            type: 'country',
-                            isDistractor: true,
-                          },
-                        //   {
-                        //     theme: 'filmByCountry',
-                        //     type: 'country',
-                        //     isDistractor: false,
-                        //   },
-                        // {
-                        //   theme: 'personByCountry',
-                        //   type: 'country',
-                        //   isDistractor: false,
-                        // },
-                        // {
-                        //   theme: 'personByCountry',
-                        //   type: 'country',
-                        //   isDistractor: false,
-                        // },
-                        // {
-                        //   theme: 'musicianByCountry',
-                        //   type: 'country',
-                        //   isDistractor: false,
-                        // },
-                        // {
-                        //   theme: 'musicianByCountry',
-                        //   type: 'country',
-                        //   isDistractor: false,
-                        // }
-                        {
-                            theme: 'end',
-                            type: 'end',
-                            isDistractor: true,
-                        }
-                      ];
-                  
-                   
+  
                 return action$.pipe(
                     ofType<any>(RUN_QUESTIONS_LIST),
                     tap(() => console.log('EPIC - RUN_QUESTIONS_LIST')),
                     concatMap((action:any) => { 
-                        const questionsJSON:string[] = questionList.map(q => JSON.stringify(q));
+                        // we stringify to take advantage of rxJS opeator 'from' which accept string only (not objects like QuestionParams)
+                        const questionsJSON:string[] = questionMainList.map(q => JSON.stringify(q));
                         console.log('questionsJSON', questionsJSON);
                         return from(questionsJSON);
                     }),
                   //  delay(1000),
                     map((questionJSON:any)=>{
+                        // Parse to get the object QuestionParams from Json string
                         const questionParams:QuestionParams = JSON.parse(questionJSON);
                         console.log('questionParams', questionParams);
                         if(questionParams.theme === 'end') {

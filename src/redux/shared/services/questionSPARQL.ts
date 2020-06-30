@@ -3,13 +3,14 @@ import { ajax } from "rxjs/ajax";
 import { of } from "rxjs";
 //import { getFilmFromImdb, getImdbFromWD} from './filmSPARQL'
 import { randomIntFromInterval } from './utilitySPARQL';
+import { QUERIES_MAP } from './../../constants'
 
 export interface Article {
     label: string;
     image: string;
 }
 
-const placeQuery = (code:string)  => {
+const locationQuery = (code:string)  => {
   console.log('placeQuery', code);
   return `https://dbpedia.org/sparql?query=
   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
@@ -155,18 +156,21 @@ SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
   PREFIX owl:<http://www.w3.org/2002/07/owl%23>
   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
   SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
-    ?people <http://dbpedia.org/ontology/birthPlace> ?country.
+    ?people <http://dbpedia.org/ontology/birthPlace> ?place.
+    ?place <http://dbpedia.org/ontology/country> ?country.
     ?country owl:sameAs <http://www.wikidata.org/entity/${code}>.
     ?people <http://purl.org/dc/terms/subject> ?subject.
     ?people <http://purl.org/dc/terms/subject> <http://dbpedia.org/resource/Category:Living_people>.
     ?people <http://dbpedia.org/ontology/thumbnail> ?image.
     ?people rdfs:label ?label.
-    FILTER (LANG(?label) = "en")
+    FILTER (LANG(?label) = "en").
+    FILTER (NOT EXISTS {?people <http://purl.org/linguistics/gold/hypernym> <http://dbpedia.org/resource/Footballer>}).
+    FILTER (NOT EXISTS {?people <http://purl.org/linguistics/gold/hypernym> <http://dbpedia.org/resource/Midfielder>}).
     }
     GROUP BY ?label ?image
     HAVING (COUNT(distinct ?subject) > 1)
     ORDER BY DESC(?count)
-    LIMIT 10
+    LIMIT 20
      &format=json`;
 
 const personByRegionQuery = (code:string)  => `https://dbpedia.org/sparql?query=
@@ -187,23 +191,25 @@ const personByRegionQuery = (code:string)  => `https://dbpedia.org/sparql?query=
     LIMIT 10
      &format=json`;
 
-  const queryMap:any = {
-    'personByRegion':personByRegionQuery,
-    'musicianByCountry':musicianByCountryQuery,
-    'personByCountry':personByCountryQuery,
-    'animalByCountry':animalByCountryQuery,
-    'riverByCountry':riverByCountryQuery,
-    'footballerByCountry':footballerByCountryQuery,
-    'actorByCountry':actorByCountryQuery,
-    'bandByCountry':bandByCountryQuery,
-    'place':placeQuery,
-    'dishByCountry':dishByCountryQuery,
+    
+  const queriesMap:QUERIES_MAP = {
+    musicianByCountry:musicianByCountryQuery,
+    personByCountry:personByCountryQuery,
+    personByRegion:personByRegionQuery,
+    animalByCountry:animalByCountryQuery,
+    riverByCountry:riverByCountryQuery,
+    footballerByCountry:footballerByCountryQuery,
+    actorByCountry:actorByCountryQuery,
+    bandByCountry:bandByCountryQuery,
+    location:locationQuery,
+    dishByCountry:dishByCountryQuery,
+    
   };
 
 const getSparqlChoice = (theme:string, codeWD: string) => {
   
- 
-  const request$ = ajax(encodeURI(queryMap[theme](codeWD)).replace(/%2523/g,'%23'))
+ // @ts-ignore
+  const request$ = ajax(encodeURI(queriesMap[theme](codeWD)).replace(/%2523/g,'%23'))
   .pipe(
      map(response => {
          console.log('getSparqlChoice response: ', response);

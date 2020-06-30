@@ -112,7 +112,7 @@ const questionList = [
   }
 ];
 const runQuestions = () => {
-
+   dispatch(ActionCreators.quizActions.clearQuestionsList());
     dispatch(ActionCreators.quizActions.runQuestionsList());
     
  

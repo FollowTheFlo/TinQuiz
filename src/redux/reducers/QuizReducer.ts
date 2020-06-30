@@ -9,7 +9,8 @@ import{
     RUN_DISTRACTOR,
     IGNORE_QUESTION,
     RUN_QUESTION,
-    END_QUESTIONS_LIST
+    END_QUESTIONS_LIST,
+    CLEAR_QUESTIONS_LIST
     } from "./../constants";
 import { FillQuizAction, FillDistractorAction, FillQuestionAction, RunDistractorAction } from "../actions/quizActions";
 
@@ -127,6 +128,18 @@ export interface Distractor {
           
           return {  
               ...state, loading:false
+          };
+        }
+        case CLEAR_QUESTIONS_LIST: {
+          console.log('REDUCER - CLEAR_QUESTIONS_LIST: ');
+          
+          return {  
+              ...state, loading:false, quiz: {
+                ...state.quiz,
+                location: {...state.quiz.location},
+                distractor: {...state.quiz.distractor},
+                questions: []
+              }
           };
         }
         case 'FILL_QUESTION': {
