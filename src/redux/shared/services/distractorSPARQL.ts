@@ -1,15 +1,13 @@
-import { from, of } from "rxjs";
+import { from, of, throwError } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { map, catchError, switchMap, concatMap } from "rxjs/operators";
+import { randomIntFromInterval, getWDfromDBP } from './utilitySPARQL';
+import { throws } from "assert";
 
 interface WDResponse {
     label: string;
     code: string;
 }
-
-function randomIntFromInterval(min:number, max:number) { // min and max included 
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
 
 const getSparqlCountryList = (countryWD: string) => {
 
@@ -23,7 +21,7 @@ const getSparqlCountryList = (countryWD: string) => {
         ?country wdt:P30 ?continent.
         ?country wdt:P1082 ?population.
         FILTER NOT EXISTS { ?country wdt:P576 ?existedInPast.}
-        FILTER ( ?population >= 1000000)
+        FILTER ( ?population >= 10000000)
         FILTER ( ?country != wd:${countryWD})
         SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
@@ -81,7 +79,7 @@ ORDER BY DESC(?population)
     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
     }
     ORDER BY DESC(?population)
-    LIMIT 500
+    LIMIT 200
     `
     const  request$ = ajax(
         {
@@ -96,6 +94,7 @@ ORDER BY DESC(?population)
       ).pipe(
         map(response => {
             console.log('response: ', response.response.results.bindings)
+          
             return response.response.results.bindings;
         
         }),
@@ -173,7 +172,7 @@ ORDER BY DESC(?population)
            return getWDfromDBP(selectedPlace.code);
        }),
        map(codeWD => {
-        selectedPlace.code = codeWD.replace("http://www.wikidata.org/entity/","");
+       selectedPlace.code = codeWD.replace("http://www.wikidata.org/entity/","");
        console.log('selectedPlace***********************', selectedPlace);
         return selectedPlace;
     }),
@@ -211,35 +210,10 @@ ORDER BY DESC(?population)
     return request$;
   }
 
-  const getWDfromDBP = (elDBP: string) => {
-    console.log('getWDfromDBP', elDBP);
-    const queryEntityWD = `https://dbpedia.org/sparql?query=
-    PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema%23>
-    PREFIX owl:<http://www.w3.org/2002/07/owl%23>
-    SELECT ?code WHERE {
-      <${elDBP}> rdfs:label ?placeLabel.
-      <${elDBP}> owl:sameAs ?WDCode.
-      BIND(STR(?WDCode) AS ?code).
-      FILTER(STRSTARTS(?code,"http://www.wikidata")).
-      FILTER (LANG(?placeLabel) = "en")
-      }
-      ORDER BY DESC(?placePopulation)
-      LIMIT 1&format=json`;
-    const request$ = ajax(encodeURI(queryEntityWD).replace(/%2523/g,'%23'))
-    .pipe(
-       map(response => {
-           console.log('DBPEDIA response: ', response);
-           return response.response.results.bindings[0].code.value;
-       
-       }),      
 
-    catchError(error => {
-        console.log('error: ', error);
-        return of(error);
-    })
-       );
-    return request$;
-  }
+
+  
+  
 
   export {
     getSparqlCountryList,

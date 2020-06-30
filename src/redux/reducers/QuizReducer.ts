@@ -8,7 +8,8 @@ import{
     FILL_DISTRACTOR,
     RUN_DISTRACTOR,
     IGNORE_QUESTION,
-    RUN_QUESTION
+    RUN_QUESTION,
+    END_QUESTIONS_LIST
     } from "./../constants";
 import { FillQuizAction, FillDistractorAction, FillQuestionAction, RunDistractorAction } from "../actions/quizActions";
 
@@ -64,12 +65,12 @@ export interface Distractor {
             lat:-1.325183,
             lng:48.523252},
         distractor: {
-            place: '',
-            placeWD: '',
-            region: '',
-            regionWD: '',
-            country: '',
-            countryWD: '',
+            place: 'Montreal',
+            placeWD: 'Q340',
+            region: 'Quebec',
+            regionWD: 'Q176',
+            country: 'United Kingdom',
+            countryWD: 'Q145',
         },
     },
       errorMessage:'',
@@ -119,6 +120,13 @@ export interface Distractor {
           
           return {  
               ...state, loading:true
+          };
+        }
+        case END_QUESTIONS_LIST: {
+          console.log('REDUCER - END_QUESTIONS_LIST: ');
+          
+          return {  
+              ...state, loading:false
           };
         }
         case 'FILL_QUESTION': {

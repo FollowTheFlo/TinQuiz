@@ -1,12 +1,13 @@
 import { ofType, Epic } from 'redux-observable';
 import { map, catchError, tap, switchMap, mergeMap, concatMap, delay } from 'rxjs/operators';
 import ActionCreators, { Action } from '../actions';
-import { FILL_QUIZ, FILL_DISTRACTOR, RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST } from '../constants';
-import { FillQuizAction, FillDistractorAction, RunQuestionAction, QuestionParams, RunDistractorAction } from '../actions/quizActions';
+import { RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST } from '../constants';
+import { RunQuestionAction, QuestionParams, RunDistractorAction } from '../actions/quizActions';
 import { getSparqlCountryList, getSparqlRegionList, getSparqlPlaceList } from '../shared/services/distractorSPARQL';
 import { RootState } from '../reducers';
 import { from, of } from 'rxjs';
 import { getSparqlChoice, Article } from '../shared/services/questionSPARQL';
+import { getSparqlFilmChoice } from '../shared/services/filmSPARQL';
 import { Question } from '../reducers/QuizReducer'
 import { Location } from '../reducers/GeoReducer';
 
@@ -46,8 +47,11 @@ export const quizEpic: Epic<Action> = (
         }),
     concatMap((response:any) => {
         console.log('ajax2', response);
-        distractor.region = response.label;
-        distractor.regionWD = response.code;
+        if(response) {
+            distractor.region = response.label;
+            distractor.regionWD = response.code;
+        }
+       
         console.log('distractor1',distractor);
         return getSparqlPlaceList(location.placeWD);
         
@@ -69,103 +73,6 @@ export const quizEpic: Epic<Action> = (
 
     }
 
-    export const questionMusicianEpic: Epic<Action> = (
-        action$, state$
-      ) =>{
-        let inputEl:any;     
-        return action$.pipe(
-         ofType<any>('FILL_DISTRACTORR'),
-         tap(() => console.log('EPIC - FILL_DISTRACTOR')),
-         
-         // mapTo({ type: 'PLACE_ADDED'})
-         switchMap((action:FillDistractorAction) => { 
-           
-            let inputArray = [
-                JSON.stringify({question:`Music artist from ${state$.value.quiz.quiz.location.country} ?`,country:state$.value.quiz.quiz.distractor.country, code:state$.value.quiz.quiz.distractor.countryWD, correct:false, label:'',image:''}),
-                JSON.stringify({question:`Music artist from ${state$.value.quiz.quiz.location.country} ?`,country:state$.value.quiz.quiz.location.country, code:state$.value.quiz.quiz.location.countryWD, correct:true, label:'',image:''})
-            ];
-           return from(inputArray);           
-         }),
-        concatMap((response:string) => {
-            console.log('Stream Result before parse', response);
-            inputEl = JSON.parse(response);
-            console.log('Stream Result after parse', response); 
-            console.log('EPIC inputArray stream', inputEl);
-            return getSparqlChoice('musicianByCountry',inputEl.code);
-        
-        }),
-        map((response:Article) => {
-           
-           if(response.image === '' || response.label === '') {
-            return ActionCreators.quizActions.ignoreQuestion();
-           }
-           
-            console.log('FINAL EPIC getMusician,',inputEl);
-            const question:Question = {
-                id: Date.now().toString(),
-                geoType: 'country',
-                theme: 'musician',
-                phrase: inputEl.question,
-                subPhrase: inputEl.label,
-                correct: inputEl.correct,
-                correctArea: inputEl.country,
-                image: response.image,
-                label: response.label,
-            }
-            return ActionCreators.quizActions.fillQuestion({question: question});
-             }),         
-        )
-    
-        }
-
-    export const personByRegionEpic: Epic<Action> = (
-        action$, state$
-        ) =>{
-        let inputEl:any;     
-
-        return action$.pipe(
-            ofType<any>('FILL_DISTRACTORR'),
-            tap(() => console.log('EPIC - FILL_DISTRACTOR')),
-            
-            // mapTo({ type: 'PLACE_ADDED'})
-            switchMap((action:FillQuizAction) => { 
-            let inputArray = [
-                JSON.stringify({question:`People from ${state$.value.quiz.quiz.location.region} ?`,country:state$.value.quiz.quiz.distractor.country, code:state$.value.quiz.quiz.distractor.regionWD, correct:false, label:'',image:''}),
-                JSON.stringify({question:`People from ${state$.value.quiz.quiz.location.region} ?`,country:state$.value.quiz.quiz.location.country, code:state$.value.quiz.quiz.location.regionWD, correct:true, label:'',image:''})
-            ];
-            return from(inputArray);           
-            }),
-        concatMap((response:string) => {
-            console.log('Stream Result before parse', response);
-            inputEl = JSON.parse(response);
- 
-            return getSparqlChoice('personByRegionQuery',inputEl.code);
-        
-        }),
-        map((response:Article) => {
-            
-            if(response.image === '' || response.label === '') {
-            return ActionCreators.quizActions.ignoreQuestion();
-            }
-            
-            console.log('FINAL EPIC getMusician,',inputEl);
-            const question:Question = {
-                id: Date.now().toString(),
-                geoType: 'region',
-                theme: 'people',
-                phrase: inputEl.question,
-                subPhrase: inputEl.label,
-                correct: inputEl.correct,
-                correctArea: inputEl.country,
-                image: response.image,
-                label: response.label,
-            }
-            return ActionCreators.quizActions.fillQuestion({question: question});
-                }),         
-        )
-    
-        }
-////////////////////////
 
 interface localQuestionParams extends QuestionParams {
     code: string;
@@ -174,7 +81,16 @@ interface localQuestionParams extends QuestionParams {
 }
 const questionMap:any = {
     'musicianByCountry' : 'Musician from',
-    'personByRegion' : 'Person from'
+    'personByRegion' : 'Person from',
+    'filmByCountry' : 'Film from a Director of',
+    'personByCountry' : 'Person from',
+    'animalByCountry' : 'animal from ',
+    'riverByCountry' : 'River from',
+    'footballerByCountry' : 'Footballer born in',
+    'actorByCountry' : 'Actor from',
+    'bandByCountry' : 'Music band from',
+    'place' : 'is it',
+    'dishByCountry' : 'Dish from',
 }
         export const questionEpic: Epic<Action> = (
             action$, state$
@@ -186,7 +102,6 @@ const questionMap:any = {
                 ofType<any>(RUN_QUESTION),
                 tap(() => console.log('EPIC - RUN_QUESTION')),
                 
-                // mapTo({ type: 'PLACE_ADDED'})
                 concatMap((action:RunQuestionAction) => { 
                     actionParams = {
                         ...action.params,
@@ -195,20 +110,15 @@ const questionMap:any = {
                         correctArea: action.params.isDistractor ? state$.value.quiz.quiz.distractor[action.params.type] : state$.value.quiz.quiz.location[action.params.type],
  
                     };
-                // let inputArray = [
-                //     JSON.stringify({question:`People from ${state$.value.quiz.quiz.location[action.params.type]} ?`,country:state$.value.quiz.quiz.distractor.country, code:state$.value.quiz.quiz.distractor[action.params.type + 'WD'], correct:false, label:'',image:''}),
-                //     JSON.stringify({question:`People from ${state$.value.quiz.quiz.location[action.params.type]} ?`,country:state$.value.quiz.quiz.location.country, code:state$.value.quiz.quiz.location[action.params.type + 'WD'], correct:true, label:'',image:''})
-                // ];
-                // return from(inputArray);   
-                return getSparqlChoice(actionParams.theme,actionParams.code);        
+                    console.log('actionParams.theme', actionParams.theme);    
+                    if(actionParams.theme === 'filmByCountry') {
+                        console.log('in condition FilmByCountry');
+                        return getSparqlFilmChoice(actionParams.theme,actionParams.code);
+                    }
+
+                    return getSparqlChoice(actionParams.theme,actionParams.code);        
                 }),
-            // concatMap((response:string) => {
-            //     console.log('Stream Result before parse', response);
-            //     inputEl = JSON.parse(response);
-     
-            //     return getSparqlChoice(actionParams.theme,inputEl.code);
-            
-            // }),
+
             map((response:Article) => {
                 
                 if(response.image === '' || response.label === '') {
@@ -220,7 +130,7 @@ const questionMap:any = {
                     id: Date.now().toString(),
                     geoType: actionParams.type,
                     theme: actionParams.theme,
-                    phrase: `${questionMap[actionParams.theme]} from ${actionParams.area} ?`,
+                    phrase: `${questionMap[actionParams.theme]} ${actionParams.area} ?`,
                     subPhrase: state$.value.quiz.quiz.location[actionParams.type],
                     correct: actionParams.isDistractor ? false : true,
                     correctArea: actionParams.correctArea,
@@ -238,24 +148,105 @@ const questionMap:any = {
                 ) =>{
                     const questionList = [
                         {
-                          theme: 'personByRegion',
-                          type: 'region',
-                          isDistractor: false,
-                        },
+                            theme: 'place',
+                            type: 'place',
+                            isDistractor: false,
+                          },
+                         
+                          {
+                            theme: 'bandByCountry',
+                            type: 'country',
+                            isDistractor: false,
+                          },
+                          {
+                            theme: 'riverByCountry',
+                            type: 'country',
+                            isDistractor: true,
+                          },
+                          {
+                            theme: 'actorByCountry',
+                            type: 'country',
+                            isDistractor: true,
+                          },
+                          {
+                            theme: 'animalByCountry',
+                            type: 'country',
+                            isDistractor: false,
+                          },
+                          {
+                            theme: 'personByCountry',
+                            type: 'country',
+                            isDistractor: true,
+                          },
+                          {
+                            theme: 'actorByCountry',
+                            type: 'country',
+                            isDistractor: false,
+                          },
+                          {
+                            theme: 'musicianByCountry',
+                            type: 'country',
+                            isDistractor: false,
+                          },
+                          {
+                            theme: 'filmByCountry',
+                            type: 'country',
+                            isDistractor: false,
+                          },
+                          {
+                            theme: 'filmByCountry',
+                            type: 'country',
+                            isDistractor: true,
+                          },
+                          {
+                            theme: 'footballerByCountry',
+                            type: 'country',
+                            isDistractor: true,
+                          },
+                          {
+                            theme: 'footballerByCountry',
+                            type: 'country',
+                            isDistractor: false,
+                          },
+                          {
+                            theme: 'dishByCountry',
+                            type: 'country',
+                            isDistractor: false,
+                          },
+                          {
+                            theme: 'dishByCountry',
+                            type: 'country',
+                            isDistractor: true,
+                          },
+                        //   {
+                        //     theme: 'filmByCountry',
+                        //     type: 'country',
+                        //     isDistractor: false,
+                        //   },
+                        // {
+                        //   theme: 'personByCountry',
+                        //   type: 'country',
+                        //   isDistractor: false,
+                        // },
+                        // {
+                        //   theme: 'personByCountry',
+                        //   type: 'country',
+                        //   isDistractor: false,
+                        // },
+                        // {
+                        //   theme: 'musicianByCountry',
+                        //   type: 'country',
+                        //   isDistractor: false,
+                        // },
+                        // {
+                        //   theme: 'musicianByCountry',
+                        //   type: 'country',
+                        //   isDistractor: false,
+                        // }
                         {
-                          theme: 'personByRegion',
-                          type: 'region',
-                          isDistractor: true,
-                        },
-                        {
-                          theme: 'musicianByCountry',
-                          type: 'country',
-                          isDistractor: false,
-                        },
-                        {
-                          theme: 'musicianByCountry',
-                          type: 'country',
-                          isDistractor: true,
+                            theme: 'end',
+                            type: 'end',
+                            isDistractor: true,
                         }
                       ];
                   
@@ -268,10 +259,13 @@ const questionMap:any = {
                         console.log('questionsJSON', questionsJSON);
                         return from(questionsJSON);
                     }),
-                    delay(1000),
+                  //  delay(1000),
                     map((questionJSON:any)=>{
                         const questionParams:QuestionParams = JSON.parse(questionJSON);
                         console.log('questionParams', questionParams);
+                        if(questionParams.theme === 'end') {
+                            return  ActionCreators.quizActions.endQuestionsList();
+                        }
                         return  ActionCreators.quizActions.runQuestion(questionParams);
                     })
                     

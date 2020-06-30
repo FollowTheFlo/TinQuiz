@@ -1,4 +1,4 @@
-import { FILL_QUIZ, FILL_DISTRACTOR, FILL_QUESTION, IGNORE_QUESTION, RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST } from "../constants";
+import { FILL_QUIZ, FILL_DISTRACTOR, FILL_QUESTION, IGNORE_QUESTION, RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST, END_QUESTIONS_LIST } from "../constants";
 import { Location } from "../reducers/GeoReducer";
 import { Distractor, Question } from "../reducers/QuizReducer";
 
@@ -63,6 +63,7 @@ const ActionCreators = {
     ignoreQuestion: () => ({ type: IGNORE_QUESTION}),
     runQuestion: (params:QuestionParams) => ({ type: RUN_QUESTION, params: params}),
     runQuestionsList: () => ({ type: RUN_QUESTIONS_LIST}),
+    endQuestionsList: () => ({ type: END_QUESTIONS_LIST}),
   }
 
   export default ActionCreators;

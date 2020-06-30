@@ -200,56 +200,23 @@ const runQuestions = () => {
             </IonCol>
           </IonRow>
           <IonRow className="ion-margin-top">
-            <IonCol offset="4" size="3">
+            <IonCol offset="2" size="8">
   
             <IonButton onClick={locateUser}>
                <IonLabel>Locate Me</IonLabel>
             </IonButton>
-            {/* <IonButton onClick={fillQuiz}>
-               <IonLabel>Run Distractor</IonLabel>
-            </IonButton> */}
-            {
-              (distractor.country && distractor.countryWD) ? 
+
+   
                 <IonButton onClick={runQuestions}>
                   <IonLabel>Run Questions</IonLabel>
                 </IonButton>
-              : ''
-            }
-       
-            
-            {/* <IonButton onClick={
-              
-              (qwantKeyRef && qwantKeyRef.current && qwantKeyRef.current.value) ?
-              // @ts-ignore
-                () => launchQwant(qwantKeyRef.current.value.toString()) :
-                () => launchQwant("")
-
-              
-              }>
-               <IonLabel>Qwant Search</IonLabel>
-            </IonButton> */}
-          
-           
+        
+     
             </IonCol>
           </IonRow>
-          {/* <IonRow>
-            <IonCol offset="2" size="8">
-            <IonItem>
-              <IonLabel>Reverse Proxy</IonLabel>
-              <IonToggle 
-               checked={proxyActivated} onIonChange={e => {
-                 console.log('IonToggle', e);
-                 proxyToggleChange(e.detail.checked);
-                }}
-              color="primary" />
-            </IonItem>
-            </IonCol>
-          </IonRow> */}
+
           <IonRow className="ion-margin-top">
             <IonCol offset="6" size="1">
-           {
-            qwantLoading ? <IonSpinner name='circles'/> : ''
-           }
            {
             geoLoading ? <IonSpinner name='dots'/> : ''
             }
@@ -262,21 +229,12 @@ const runQuestions = () => {
               
               <IonCol offset="1" size="10">
               
-            {/* <IonItem>
-               <IonLabel> {distractor.country} </IonLabel>
-               <IonLabel> {distractor.region} </IonLabel>
-               <IonLabel> {distractor.place} </IonLabel>
-            </IonItem> */}
-                  
-                   
-          
-               
-        
+
               </IonCol>
             </IonRow>
             <IonRow className="ion-margin-top">
 
-              <IonCol offset="1" size="10">
+              <IonCol offset="0" size="12">
               {
           
                    questions.length > 0 ? questionsContent : contentNull

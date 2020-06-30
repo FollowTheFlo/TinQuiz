@@ -27,6 +27,11 @@ const getDBPfromWD = (placeWD: string) => {
     return request;
   }
 
+
+  const  randomIntFromInterval = (min:number, max:number) => { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
   const getWDfromDBP = (elDBP: string) => {
     console.log('getWDfromDBP', elDBP);
     const queryEntityWD = `https://dbpedia.org/sparql?query=
@@ -43,10 +48,10 @@ const getDBPfromWD = (placeWD: string) => {
       LIMIT 1&format=json`;
     const request$ = ajax(encodeURI(queryEntityWD).replace(/%2523/g,'%23'))
     .pipe(
-       map(response => {
-           console.log('DBPEDIA response: ', response);
-           return response.response.results.bindings[0].code.value;
-       
+       map((response:any) => {
+        console.log('DBPEDIA response: ', response);
+        //extract code from the wikidata link
+           return response.response.results.bindings[0].code.value.replace("http://www.wikidata.org/entity/","");  
        }),      
 
     catchError(error => {
@@ -60,4 +65,5 @@ const getDBPfromWD = (placeWD: string) => {
   export {
       getDBPfromWD,
       getWDfromDBP,
+      randomIntFromInterval,
   };

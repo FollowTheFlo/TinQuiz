@@ -2,41 +2,138 @@ import { map, catchError } from "rxjs/operators";
 import { ajax } from "rxjs/ajax";
 import { of } from "rxjs";
 //import { getFilmFromImdb, getImdbFromWD} from './filmSPARQL'
+import { randomIntFromInterval } from './utilitySPARQL';
 
 export interface Article {
     label: string;
     image: string;
 }
 
-
+const placeQuery = (code:string)  => {
+  console.log('placeQuery', code);
+  return `https://dbpedia.org/sparql?query=
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
+  SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
+    ?place <http://dbpedia.org/ontology/thumbnail> ?image.    
+        ?place owl:sameAs <http://www.wikidata.org/entity/${code}>.
+        bind( "-"  as ?label)
+        }
+        LIMIT 1 &format=json`};
 ////////////////
-const FilmByCountryQuery = (code:string)  => `https://dbpedia.org/sparql?query=
-SELECT DISTINCT ?film ?filmLabel ?subjectCount as ?Popularity (COUNT(distinct ?filmDirectors) as ?dirCount) WHERE {
-  ?film <http://www.w3.org/2000/01/rdf-schema#label> ?filmLabel.
-  ?film <http://dbpedia.org/ontology/director> ?filmDirectors.
-  FILTER (LANG(?filmLabel) = "en")
-  {
-  SELECT ?film ?countryLabel  (COUNT(distinct ?subject) as ?subjectCount) WHERE {
-  ?director <http://dbpedia.org/ontology/birthPlace> ?place.
+const bandByCountryQuery = (code:string)  => `https://dbpedia.org/sparql?query=
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
+  PREFIX owl: <http://www.w3.org/2002/07/owl%23>
+  SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
+    ?band rdfs:label ?label.
+    ?band <http://dbpedia.org/ontology/hometown> ?place.
+    ?place <http://dbpedia.org/ontology/country> ?country.
+    ?country owl:sameAs <http://www.wikidata.org/entity/${code}>.
+    ?band <http://purl.org/dc/terms/subject> ?subject.
+    ?band <http://dbpedia.org/ontology/thumbnail> ?image.
+    ?band <http://purl.org/linguistics/gold/hypernym> <http://dbpedia.org/resource/Band>.
+    FILTER (LANG(?label) = "en").
+    }
+    GROUP BY ?label ?image
+    HAVING (COUNT(distinct ?subject) >= 0)
+    ORDER BY DESC(?count)
+    LIMIT 200 &format=json`;
+
+
+const actorByCountryQuery = (code:string)  => `https://dbpedia.org/sparql?query=
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
+  PREFIX owl: <http://www.w3.org/2002/07/owl%23>
+  SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
+    ?actor rdfs:label ?label.
+ ?place <http://dbpedia.org/ontology/country> ?country.
+ ?actor  <http://dbpedia.org/ontology/birthPlace> ?place.
+ ?country owl:sameAs <http://www.wikidata.org/entity/${code}>.
+   ?actor <http://purl.org/dc/terms/subject> ?subject.
+   ?actor <http://dbpedia.org/ontology/thumbnail> ?image.
+   ?actor <http://purl.org/linguistics/gold/hypernym> <http://dbpedia.org/resource/Actor>.
+ ?actor  <http://purl.org/dc/terms/subject> <http://dbpedia.org/resource/Category:Living_people>.
+ 
+ FILTER (LANG(?label) = "en").
+   }
+   GROUP BY ?label ?image
+   HAVING (COUNT(distinct ?subject) >= 0)
+   ORDER BY DESC(?count)
+   LIMIT 50 &format=json`;
+
+  const footballerByCountryQuery = (code:string)  => `https://dbpedia.org/sparql?query=
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
+  PREFIX owl: <http://www.w3.org/2002/07/owl%23>
+  SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
+ 
+    ?player rdfs:label ?label.
   ?place <http://dbpedia.org/ontology/country> ?country.
-  ?country <http://www.w3.org/2000/01/rdf-schema#label> ?countryLabel.
-  ?country owl:sameAs <http://www.wikidata.org/entity/Q142>.
-  ?film <http://purl.org/linguistics/gold/hypernym> <http://dbpedia.org/resource/Film>.
-  ?film <http://dbpedia.org/ontology/director> ?director.
-  ?director <http://purl.org/linguistics/gold/hypernym> <http://dbpedia.org/resource/Director>.
-  ?film <http://dbpedia.org/property/country> ?countryFilmLabel.
-  ?film <http://purl.org/dc/terms/subject> ?subject
+  ?player  <http://dbpedia.org/ontology/birthPlace> ?place.
+  ?country owl:sameAs <http://www.wikidata.org/entity/${code}>.
+    ?player <http://purl.org/dc/terms/subject> ?subject.
+    ?player <http://dbpedia.org/ontology/thumbnail> ?image.
+    ?player <http://purl.org/linguistics/gold/hypernym> <http://dbpedia.org/resource/Footballer>.
+  ?player  <http://purl.org/dc/terms/subject> <http://dbpedia.org/resource/Category:Living_people>.
+  ?player <http://dbpedia.org/ontology/team> ?team.
+  
+  FILTER (LANG(?label) = "en").
+    }
+    GROUP BY ?label ?image
+    HAVING (COUNT(distinct ?subject) >= 0)
+    ORDER BY DESC(?count)
+    LIMIT 5 &format=json`;
+
+
+  const riverByCountryQuery = (code:string)  => `https://dbpedia.org/sparql?query=
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
+PREFIX owl: <http://www.w3.org/2002/07/owl%23>
+SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
+  ?river <http://dbpedia.org/ontology/sourceCountry> ?country.
+  ?country owl:sameAs <http://www.wikidata.org/entity/${code}>.
+  ?river rdfs:label ?label.
+  ?river <http://purl.org/dc/terms/subject> ?subject.
+  ?river <http://dbpedia.org/ontology/thumbnail> ?image.
+  ?river <http://purl.org/linguistics/gold/hypernym> <http://dbpedia.org/resource/River>.
+FILTER (LANG(?label) = "en")
   }
-  GROUP BY ?film ?countryLabel 
-  HAVING (COUNT(distinct ?subject) > 0)
-  ORDER BY DESC(?subjectCount)
-  LIMIT 500  
-  }  
+  GROUP BY ?label ?image
+  HAVING (COUNT(distinct ?subject) >= 0)
+  ORDER BY DESC(?count)
+  LIMIT 10 &format=json`;
+
+  const dishByCountryQuery = (code:string)  => `https://dbpedia.org/sparql?query=
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
+  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns%23>
+  PREFIX owl: <http://www.w3.org/2002/07/owl%23>
+  SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
+    ?dish <http://dbpedia.org/ontology/country> ?country.
+    ?country owl:sameAs <http://www.wikidata.org/entity/${code}>.
+    ?dish rdfs:label ?label.
+    ?dish <http://purl.org/dc/terms/subject> ?subject.
+    ?dish <http://dbpedia.org/ontology/thumbnail> ?image.
+    ?dish rdf:type <http://dbpedia.org/ontology/Food>.
+    FILTER (LANG(?label) = "en")
+    }
+    GROUP BY ?label ?image
+    HAVING (COUNT(distinct ?subject) >= 0)
+    ORDER BY DESC(?count)
+    LIMIT 50 &format=json`;
+
+const animalByCountryQuery = (code:string)  => `https://dbpedia.org/sparql?query=
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
+SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
+  ?animal <http://dbpedia.org/property/country> ?country.
+  ?country owl:sameAs <http://www.wikidata.org/entity/${code}>.
+  ?animal rdfs:label ?label.
+  ?animal <http://purl.org/dc/terms/subject> ?subject.
+  ?animal <http://dbpedia.org/ontology/thumbnail> ?image.
+  ?animal <http://purl.org/linguistics/gold/hypernym> <http://dbpedia.org/resource/Breed>.
+  FILTER (LANG(?label) = "en")
   }
-  GROUP BY ?film ?filmLabel ?subjectCount
-  HAVING (COUNT(distinct ?filmDirectors) = 1)
-  ORDER BY DESC(?subjectCount)
-  LIMIT 500 &format=json`;
+  GROUP BY ?label ?image
+  HAVING (COUNT(distinct ?subject) >= 0)
+  ORDER BY DESC(?count)
+  LIMIT 50 &format=json`;
+
+  
 
 const musicianByCountryQuery = (code:string)  => `https://dbpedia.org/sparql?query=
 SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
@@ -52,7 +149,25 @@ SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
     GROUP BY ?musician ?image ?label
     HAVING (COUNT(distinct ?subject) >= 0)
     ORDER BY DESC(?count)
-    LIMIT 20 &format=json`;
+    LIMIT 10 &format=json`;
+
+    const personByCountryQuery = (code:string)  => `https://dbpedia.org/sparql?query=
+  PREFIX owl:<http://www.w3.org/2002/07/owl%23>
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema%23>
+  SELECT  ?label ?image (COUNT(distinct ?subject) as ?count) WHERE {
+    ?people <http://dbpedia.org/ontology/birthPlace> ?country.
+    ?country owl:sameAs <http://www.wikidata.org/entity/${code}>.
+    ?people <http://purl.org/dc/terms/subject> ?subject.
+    ?people <http://purl.org/dc/terms/subject> <http://dbpedia.org/resource/Category:Living_people>.
+    ?people <http://dbpedia.org/ontology/thumbnail> ?image.
+    ?people rdfs:label ?label.
+    FILTER (LANG(?label) = "en")
+    }
+    GROUP BY ?label ?image
+    HAVING (COUNT(distinct ?subject) > 1)
+    ORDER BY DESC(?count)
+    LIMIT 10
+     &format=json`;
 
 const personByRegionQuery = (code:string)  => `https://dbpedia.org/sparql?query=
   PREFIX owl:<http://www.w3.org/2002/07/owl%23>
@@ -69,12 +184,20 @@ const personByRegionQuery = (code:string)  => `https://dbpedia.org/sparql?query=
     GROUP BY ?label ?image
     HAVING (COUNT(distinct ?subject) > 1)
     ORDER BY DESC(?count)
-    LIMIT 50
+    LIMIT 10
      &format=json`;
 
   const queryMap:any = {
     'personByRegion':personByRegionQuery,
     'musicianByCountry':musicianByCountryQuery,
+    'personByCountry':personByCountryQuery,
+    'animalByCountry':animalByCountryQuery,
+    'riverByCountry':riverByCountryQuery,
+    'footballerByCountry':footballerByCountryQuery,
+    'actorByCountry':actorByCountryQuery,
+    'bandByCountry':bandByCountryQuery,
+    'place':placeQuery,
+    'dishByCountry':dishByCountryQuery,
   };
 
 const getSparqlChoice = (theme:string, codeWD: string) => {
@@ -108,13 +231,14 @@ const getSparqlChoice = (theme:string, codeWD: string) => {
       return of(error);
   })
      );
+
   return request$;
 }
 ////////////////
 
-  function randomIntFromInterval(min:number, max:number) { // min and max included 
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
+  // const  randomIntFromInterval = (min:number, max:number) => { // min and max included 
+  //   return Math.floor(Math.random() * (max - min + 1) + min);
+  // }
 
   export {
     getSparqlChoice,

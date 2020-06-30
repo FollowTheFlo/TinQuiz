@@ -8,10 +8,6 @@ import{
   } from "./../constants";
 import ActionCreators, { Action } from "./../actions";
 import { getUserLatLng, getPlacefromlatLng } from '../shared/services/geoAPI';
-import { getDBPfromWD } from './../shared/services/utilitySPARQL'
-import { $CombinedState } from 'redux';
-
-
   
 export const locationEpic: Epic<Action> = (
     action$, state$
