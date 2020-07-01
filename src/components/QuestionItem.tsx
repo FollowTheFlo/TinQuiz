@@ -4,7 +4,7 @@ import { QwantArticle } from './../redux/store';
 import { Question } from '../redux/reducers/QuizReducer';
 
 
-const QuestionItem: React.FC<{ question: Question, key:string}> = props => {
+const QuestionItem: React.FC<{ question: Question, key:string, clickYes:any, clickNo:any}> = props => {
   return (
     <IonCard 
     >
@@ -14,8 +14,8 @@ const QuestionItem: React.FC<{ question: Question, key:string}> = props => {
         <IonImg src={props.question.image} />
       </IonCardHeader>
         <IonCardContent>         
-         <IonButton>Yes</IonButton>
-         <IonButton>No</IonButton>
+         <IonButton onClick={props.clickYes.bind(null, props.question.id)}>Yes</IonButton>
+         <IonButton onClick={props.clickNo.bind(null, props.question.id)}>No</IonButton>
         </IonCardContent>
     </IonCard>
   );

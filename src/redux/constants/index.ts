@@ -21,6 +21,8 @@ export const RUN_QUESTIONS_LIST = 'RUN_QUESTIONS_LIST';
 export const END_QUESTIONS_LIST = 'END_QUESTIONS_LIST';
 export const CLEAR_QUESTIONS_LIST = 'CLEAR_QUESTIONS_LIST';
 
+export const GO_NEXT_QUESTION = 'GO_NEXT_QUESTION';
+export const START_QUIZ = 'START_QUIZ';
 ////////////Quiz Queries///////
 
 export const musicianByCountry = 'musicianByCountry';
@@ -63,16 +65,3 @@ export interface QUERIES_MAP {
     'location' : (code:string) => string,
     'dishByCountry' : (code:string) => string,
 }
-
-// const ActionCreators = {
-//     runDistractor: (payload: RunDistractorPayload) => ({ type: RUN_DISTRACTOR, payload: payload}),
-  
-//       fillQuiz: (payload: FillQuizPayload) => ({ type: FILL_QUIZ, payload: payload}),
-//       fillDistractors: (payload: FillDistractorPayload) => ({ type: FILL_DISTRACTOR, payload: payload}),
-//       fillQuestion: (payload: FillQuestionPayload) => ({ type: FILL_QUESTION, payload: payload}),
-//       ignoreQuestion: () => ({ type: IGNORE_QUESTION}),
-//       runQuestion: (params:QuestionParams) => ({ type: RUN_QUESTION, params: params}),
-//       runQuestionsList: () => ({ type: RUN_QUESTIONS_LIST}),
-//       endQuestionsList: () => ({ type: END_QUESTIONS_LIST}),
-//       clearQuestionsList: () => ({ type: CLEAR_QUESTIONS_LIST}),
-//     }

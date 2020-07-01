@@ -149,7 +149,7 @@ export interface Distractor {
         const questions = state.quiz.questions.map(q =>{ 
          return {...q}
         });
-        const updatedQuestions = [fillDistractorAction.payload.question].concat(questions);
+        const updatedQuestions = questions.concat(fillDistractorAction.payload.question);
         return {  
             ...state, loading: false, quiz: {
               ...state.quiz,

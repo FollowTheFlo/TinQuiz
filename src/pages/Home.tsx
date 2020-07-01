@@ -39,11 +39,16 @@ const Home: React.FC = () => {
     questions: state.quiz.quiz.questions,
   });
 
+  const uQuizState = (state:RootState) => ({
+    questionIndex: state.uQuiz.questionIndex, 
+  });
+
  
   //global state
   const { target, qwantLoading, articles, proxyActivated, qwantErrorMessage } = useSelector(qwantState);
   const { location, geoErrorMessage, geoLoading } = useSelector(geoState);
   const { quizLoading, distractor, questions } = useSelector(quizState);
+  const { questionIndex } = useSelector(uQuizState);
  
   //Local state
    const [searchText, setSearchText] = useState('Saint-James');
@@ -58,19 +63,6 @@ const Home: React.FC = () => {
   },[location.place,location.region, location.country]);
 
   
-  const launchQwant = (text:string) => {
-   
-    if( text) {
-      setSearchText(text);
-      dispatch(ActionCreators.qwantActions.startQwantSearch( { 
-        target: text,
-        locale: 'fr'  
-      }));
-    } else {
-      console.log("field empty");
-    }
-      
-}
 
 const locateUser = () => {
   console.log('locateUser');
@@ -78,44 +70,27 @@ const locateUser = () => {
   
 }
 
-const fillQuiz = () => {
-  console.log('fillQuiz');
-  if(location.place) {
-    console.log('fillQuiz1');
-    dispatch(ActionCreators.quizActions.runDistractor(
-    {
-      location: location,
-    }
-));
-  }
-}
-const questionList = [
-  {
-    theme: 'personByRegion',
-    type: 'region',
-    isDistractor: false,
-  },
-  {
-    theme: 'personByRegion',
-    type: 'region',
-    isDistractor: true,
-  },
-  {
-    theme: 'musicianByCountry',
-    type: 'region',
-    isDistractor: false,
-  },
-  {
-    theme: 'musicianByCountry',
-    type: 'region',
-    isDistractor: true,
-  }
-];
+
+
 const runQuestions = () => {
    dispatch(ActionCreators.quizActions.clearQuestionsList());
-    dispatch(ActionCreators.quizActions.runQuestionsList());
+   dispatch(ActionCreators.userQuizActions.startQuiz());
+   dispatch(ActionCreators.quizActions.runQuestionsList());
     
- 
+}
+
+const clickYesHandler = (id:string) => {
+  console.log('clickYesHandler', id);
+  if(questionIndex < questions.length - 1) {
+    dispatch(ActionCreators.userQuizActions.goNextQuestion());
+  }
+}
+
+const clickNoHandler = (id:string) => {
+  console.log('clickYesHandler', id);
+  if(questionIndex < questions.length - 1) {
+    dispatch(ActionCreators.userQuizActions.goNextQuestion());
+  }
 }
 
   const proxyToggleChange = 
@@ -125,35 +100,20 @@ const runQuestions = () => {
 
   }
 
-  const deleteQwantItemHandler = (index:string) => {
-    console.log('deleteQwantItem', index);
-    dispatch(ActionCreators.qwantActions.deleteQwantArticle(index));
-
-  }
-
-  const selectItemhandler = (index:string) => {
-    console.log('deleteQwantItem', index);
-    dispatch(ActionCreators.qwantActions.selectQwantArticle(index));
-
-  }
-
   const contentNull = <p>No Questions, press 'Fill Questions'</p>;
 
-   const articlesContent =   articles.map((article: QwantArticle) => {   
-    return (<QwantItem 
-      key = {article.id} 
-      qwantArticle = {article} 
-      deleteItem = {deleteQwantItemHandler} 
-      selectItem = {selectItemhandler} 
-      />)
-  });
-
-  const questionsContent =   questions.map((question: Question) => {   
+  const questionsContent =   
+  questions.map((question: Question) => {   
     return (<QuestionItem 
       key = {question.id} 
       question = {question} 
-      />)
-  });
+      clickYes = {clickYesHandler}
+      clickNo = {clickNoHandler}
+    />)
+    })
+
+  const questionsCount =  'questions:' + (questionIndex + 1) + '/' + questions.length;
+  
 
   return (
     <IonPage>
@@ -218,26 +178,28 @@ const runQuestions = () => {
           <IonRow className="ion-margin-top">
             <IonCol offset="6" size="1">
            {
-            geoLoading ? <IonSpinner name='dots'/> : ''
+            geoLoading && <IonSpinner name='dots'/> 
             }
              {
-            quizLoading ? <IonSpinner name='lines'/> : ''
+            quizLoading && <IonSpinner name='lines'/>
             }
             </IonCol>
             </IonRow>
-            <IonRow className="ion-margin-top">
-              
-              <IonCol offset="1" size="10">
-              
 
-              </IonCol>
-            </IonRow>
             <IonRow className="ion-margin-top">
 
               <IonCol offset="0" size="12">
+              {questions.length > 0 && questionsCount}
+              
               {
           
-                   questions.length > 0 ? questionsContent : contentNull
+                   questions.length > 0 && questions[questionIndex] ? <QuestionItem
+                      key = {questions[questionIndex].id} 
+                      question = {questions[questionIndex]}
+                      clickYes = {clickYesHandler}
+                      clickNo = {clickNoHandler}
+                        /> 
+                        : contentNull
           
                }
         
