@@ -14,8 +14,8 @@ const QuestionItem: React.FC<{ question: Question, key:string, clickYes:any, cli
         <IonImg src={props.question.image} />
       </IonCardHeader>
         <IonCardContent>         
-         <IonButton onClick={props.clickYes.bind(null, props.question.id)}>Yes</IonButton>
-         <IonButton onClick={props.clickNo.bind(null, props.question.id)}>No</IonButton>
+         <IonButton onClick={props.clickYes.bind(null, props.question)}>Yes</IonButton>
+         <IonButton onClick={props.clickNo.bind(null, props.question)}>No</IonButton>
         </IonCardContent>
     </IonCard>
   );

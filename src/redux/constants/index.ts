@@ -23,6 +23,7 @@ export const CLEAR_QUESTIONS_LIST = 'CLEAR_QUESTIONS_LIST';
 
 export const GO_NEXT_QUESTION = 'GO_NEXT_QUESTION';
 export const START_QUIZ = 'START_QUIZ';
+export const END_QUIZ = 'END_QUIZ';
 ////////////Quiz Queries///////
 
 export const musicianByCountry = 'musicianByCountry';

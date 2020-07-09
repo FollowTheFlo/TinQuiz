@@ -40,7 +40,9 @@ const Home: React.FC = () => {
   });
 
   const uQuizState = (state:RootState) => ({
-    questionIndex: state.uQuiz.questionIndex, 
+    questionIndex: state.uQuiz.questionIndex,
+    uAnswers: state.uQuiz.uAnswers,
+    isFinished: state.uQuiz.isFinished, 
   });
 
  
@@ -48,7 +50,7 @@ const Home: React.FC = () => {
   const { target, qwantLoading, articles, proxyActivated, qwantErrorMessage } = useSelector(qwantState);
   const { location, geoErrorMessage, geoLoading } = useSelector(geoState);
   const { quizLoading, distractor, questions } = useSelector(quizState);
-  const { questionIndex } = useSelector(uQuizState);
+  const { questionIndex, uAnswers, isFinished } = useSelector(uQuizState);
  
   //Local state
    const [searchText, setSearchText] = useState('Saint-James');
@@ -79,23 +81,41 @@ const runQuestions = () => {
     
 }
 
-const clickYesHandler = (id:string) => {
-  console.log('clickYesHandler', id);
-  if(questionIndex < questions.length - 1) {
-    dispatch(ActionCreators.userQuizActions.goNextQuestion());
+const clickYesHandler = (currentQuestion:Question) => {
+  console.log('clickYesHandler', currentQuestion);
+  if(questionIndex < questions.length) {
+    dispatch(ActionCreators.userQuizActions.goNextQuestion(
+     { uAnswer:{
+       question: currentQuestion,
+        answer: true,
+        isCorrect: currentQuestion.correct? true: false,
+      }}
+    ));
+  }  
+  if(questionIndex === questions.length - 1) {
+    dispatch(ActionCreators.userQuizActions.endQuiz());
   }
 }
 
-const clickNoHandler = (id:string) => {
-  console.log('clickYesHandler', id);
-  if(questionIndex < questions.length - 1) {
-    dispatch(ActionCreators.userQuizActions.goNextQuestion());
+const clickNoHandler = (currentQuestion:Question) => {
+  console.log('clickYesHandler', currentQuestion.id);
+  if(questionIndex < questions.length) {
+    dispatch(ActionCreators.userQuizActions.goNextQuestion(
+      { uAnswer:{
+        question: currentQuestion,
+         answer: true,
+         isCorrect: currentQuestion.correct? false: true,
+       }}
+    ));
+  }
+  if(questionIndex === questions.length - 1) {
+    dispatch(ActionCreators.userQuizActions.endQuiz());
   }
 }
 
   const proxyToggleChange = 
   (isChecked:boolean) => {
-    console.log('proxyToggleChange', isChecked);
+    console.log('proxyToggleChange');
     dispatch(ActionCreators.qwantActions.changeProxyActivation(isChecked));
 
   }
@@ -113,6 +133,9 @@ const clickNoHandler = (id:string) => {
     })
 
   const questionsCount =  'questions:' + (questionIndex + 1) + '/' + questions.length;
+
+  const previousQuestionResult = uAnswers[questionIndex-1] && uAnswers[questionIndex-1].isCorrect ? 'Correct' : 'Incorrect';
+  const currentScore = 'Score: ' + uAnswers.filter(answer => answer.isCorrect === true).length + '/' + questionIndex;
   
 
   return (
@@ -183,17 +206,24 @@ const clickNoHandler = (id:string) => {
              {
             quizLoading && <IonSpinner name='lines'/>
             }
+          
             </IonCol>
             </IonRow>
-
+            <IonRow className="ion-margin-top">
+              <IonCol offset="0" size="12">          
+              {
+                questions.length > 0 && questionIndex > 0 && currentScore
+              }
+              </IonCol>
+            </IonRow>
             <IonRow className="ion-margin-top">
 
               <IonCol offset="0" size="12">
-              {questions.length > 0 && questionsCount}
+              { !isFinished && questions.length > 0 && questionsCount }
               
               {
           
-                   questions.length > 0 && questions[questionIndex] ? <QuestionItem
+                   !isFinished && questions.length > 0 && questions[questionIndex] ? <QuestionItem
                       key = {questions[questionIndex].id} 
                       question = {questions[questionIndex]}
                       clickYes = {clickYesHandler}

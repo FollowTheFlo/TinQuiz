@@ -1,4 +1,5 @@
-import { GO_NEXT_QUESTION, START_QUIZ } from "../constants";
+import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ } from "../constants";
+import { Uanswer} from '../reducers/UquizReducer';
 
   //---------Generic Action
   export interface Action {
@@ -7,9 +8,18 @@ import { GO_NEXT_QUESTION, START_QUIZ } from "../constants";
     params?: {};
   }
 
+    /////////GoNextQuestion
+    export interface GoNextQuestionAction extends Action {
+      payload: GoNextQuestionPayload;
+  }
+    export interface GoNextQuestionPayload{
+      uAnswer: Uanswer;
+  }
+
 const ActionCreators = {
-  goNextQuestion: () => ({ type: GO_NEXT_QUESTION}),
+  goNextQuestion: (payload: GoNextQuestionPayload) => ({ type: GO_NEXT_QUESTION, payload: payload}),
   startQuiz: () => ({ type: START_QUIZ}),
+  endQuiz: () => ({ type: END_QUIZ}),
   }
 
   export default ActionCreators;
