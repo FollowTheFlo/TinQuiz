@@ -1,6 +1,6 @@
 import {qwantEpic} from './qwantEpics';
 import {locationEpic, endLocationEpic} from './geoEpics';
-import {quizEpic,questionEpic, runQuestionListEpic} from './quizEpics';
+import {quizEpic,questionEpic, runQuestionListEpic, FillQuizEpic} from './quizEpics';
 import { combineEpics } from 'redux-observable';
 
   const AllEpics = combineEpics(
@@ -10,6 +10,7 @@ import { combineEpics } from 'redux-observable';
     quizEpic,
     questionEpic,
     runQuestionListEpic,
+    FillQuizEpic,
     
   );
 

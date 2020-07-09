@@ -12,6 +12,7 @@ export const SHOW_QWANT_ERROR = 'SHOW_QWANT_ERROR';
 export const CLEAR_QWANT_ERROR = 'CLEAR_QWANT_ERROR';
 
 export const FILL_QUIZ = 'FILL_QUIZ';
+export const SET_QUIZ_ID = 'SET_QUIZ_ID';
 export const RUN_DISTRACTOR = 'RUN_DISTRACTOR';
 export const FILL_DISTRACTOR = 'FILL_DISTRACTOR';
 export const FILL_QUESTION = 'FILL_QUESTION';

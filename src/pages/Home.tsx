@@ -3,15 +3,14 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, 
 import './Home.css';
 //import { useDispatch, useMappedState } from "redux-react-hook";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import { QwantArticle } from "../redux/store";
 import  ActionCreators  from "../redux/actions";
-import QwantItem from './../components/QwantItem';
 import { starOutline } from 'ionicons/icons';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
 import { RootState } from '../redux/reducers';
 import Alert from '../components/Alert';
 import QuestionItem from '../components/QuestionItem';
-import { Question } from '../redux/reducers/QuizReducer';
+import { Question, Quiz } from '../redux/reducers/QuizReducer';
+import { Location } from '../redux/reducers/GeoReducer';
 
 
 const Home: React.FC = () => {
@@ -33,24 +32,25 @@ const Home: React.FC = () => {
   });
 
   const quizState = (state:RootState) => ({
-    distractor: state.quiz.quiz.distractor,
     quizLoading: state.quiz.loading,
     quizErrorMessage: state.quiz.errorMessage,
     questions: state.quiz.quiz.questions,
+    currentQuiz: state.quiz.quiz,
   });
 
   const uQuizState = (state:RootState) => ({
     questionIndex: state.uQuiz.questionIndex,
     uAnswers: state.uQuiz.uAnswers,
-    isFinished: state.uQuiz.isFinished, 
+    isFinished: state.uQuiz.isFinished,
+    totalScore: state.uQuiz.score,
   });
 
  
   //global state
   const { target, qwantLoading, articles, proxyActivated, qwantErrorMessage } = useSelector(qwantState);
   const { location, geoErrorMessage, geoLoading } = useSelector(geoState);
-  const { quizLoading, distractor, questions } = useSelector(quizState);
-  const { questionIndex, uAnswers, isFinished } = useSelector(uQuizState);
+  const { quizLoading, questions, currentQuiz } = useSelector(quizState);
+  const { questionIndex, uAnswers, isFinished, totalScore } = useSelector(uQuizState);
  
   //Local state
    const [searchText, setSearchText] = useState('Saint-James');
@@ -74,15 +74,20 @@ const locateUser = () => {
 
 
 
-const runQuestions = () => {
+const runQuestions = (location:Location) => {
    dispatch(ActionCreators.quizActions.clearQuestionsList());
+   dispatch(ActionCreators.quizActions.fillQuiz(
+     {
+       location
+     }
+   ));
    dispatch(ActionCreators.userQuizActions.startQuiz());
    dispatch(ActionCreators.quizActions.runQuestionsList());
     
 }
 
 const clickYesHandler = (currentQuestion:Question) => {
-  console.log('clickYesHandler', currentQuestion);
+  console.log('clickYesHandler Question', currentQuestion);
   if(questionIndex < questions.length) {
     dispatch(ActionCreators.userQuizActions.goNextQuestion(
      { uAnswer:{
@@ -93,7 +98,11 @@ const clickYesHandler = (currentQuestion:Question) => {
     ));
   }  
   if(questionIndex === questions.length - 1) {
-    dispatch(ActionCreators.userQuizActions.endQuiz());
+    dispatch(ActionCreators.userQuizActions.endQuiz(
+      {
+        quiz: currentQuiz
+      }
+    ));
   }
 }
 
@@ -109,7 +118,11 @@ const clickNoHandler = (currentQuestion:Question) => {
     ));
   }
   if(questionIndex === questions.length - 1) {
-    dispatch(ActionCreators.userQuizActions.endQuiz());
+    dispatch(ActionCreators.userQuizActions.endQuiz(
+      {
+        quiz: currentQuiz
+      }
+    ));
   }
 }
 
@@ -122,21 +135,12 @@ const clickNoHandler = (currentQuestion:Question) => {
 
   const contentNull = <p>No Questions, press 'Fill Questions'</p>;
 
-  const questionsContent =   
-  questions.map((question: Question) => {   
-    return (<QuestionItem 
-      key = {question.id} 
-      question = {question} 
-      clickYes = {clickYesHandler}
-      clickNo = {clickNoHandler}
-    />)
-    })
 
   const questionsCount =  'questions:' + (questionIndex + 1) + '/' + questions.length;
 
   const previousQuestionResult = uAnswers[questionIndex-1] && uAnswers[questionIndex-1].isCorrect ? 'Correct' : 'Incorrect';
   const currentScore = 'Score: ' + uAnswers.filter(answer => answer.isCorrect === true).length + '/' + questionIndex;
-  
+  const resultScore = <h2>Finished with {totalScore}%</h2>;
 
   return (
     <IonPage>
@@ -190,7 +194,7 @@ const clickNoHandler = (currentQuestion:Question) => {
             </IonButton>
 
    
-                <IonButton onClick={runQuestions}>
+                <IonButton onClick={()=>runQuestions(location)}>
                   <IonLabel>Run Questions</IonLabel>
                 </IonButton>
         
@@ -223,14 +227,17 @@ const clickNoHandler = (currentQuestion:Question) => {
               
               {
           
-                   !isFinished && questions.length > 0 && questions[questionIndex] ? <QuestionItem
+                   !isFinished && questions.length > 0 && questions[questionIndex] && <QuestionItem
                       key = {questions[questionIndex].id} 
                       question = {questions[questionIndex]}
                       clickYes = {clickYesHandler}
                       clickNo = {clickNoHandler}
                         /> 
-                        : contentNull
+                        
           
+               }
+               {
+                 isFinished && resultScore
                }
         
               </IonCol>

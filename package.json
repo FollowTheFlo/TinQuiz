@@ -64,5 +64,5 @@
   "devDependencies": {
     "@capacitor/cli": "2.2.0"
   },
-  "description": "An Ionic project"
+  "description": "TinQuiz"
 }

@@ -1,4 +1,4 @@
-import { FILL_QUIZ, FILL_DISTRACTOR, FILL_QUESTION, IGNORE_QUESTION, RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST, END_QUESTIONS_LIST, CLEAR_QUESTIONS_LIST } from "../constants";
+import { FILL_QUIZ, FILL_DISTRACTOR, FILL_QUESTION, IGNORE_QUESTION, RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST, END_QUESTIONS_LIST, CLEAR_QUESTIONS_LIST, SET_QUIZ_ID } from "../constants";
 import { Location } from "../reducers/GeoReducer";
 import { Distractor, Question } from "../reducers/QuizReducer";
 
@@ -17,6 +17,14 @@ import { Distractor, Question } from "../reducers/QuizReducer";
 }
   export interface FillQuizPayload{
     location: Location;
+}
+
+/////////SetQuizId
+export interface SetQuizIdAction extends Action {
+  payload: SetQuizIdPayload;
+}
+export interface SetQuizIdPayload{
+  quizId: string;
 }
 
   /////////RunDistractor
@@ -58,6 +66,7 @@ const ActionCreators = {
   runDistractor: (payload: RunDistractorPayload) => ({ type: RUN_DISTRACTOR, payload: payload}),
 
     fillQuiz: (payload: FillQuizPayload) => ({ type: FILL_QUIZ, payload: payload}),
+    setQuizId: (payload: SetQuizIdPayload) => ({ type: SET_QUIZ_ID, payload: payload}),
     fillDistractors: (payload: FillDistractorPayload) => ({ type: FILL_DISTRACTOR, payload: payload}),
     fillQuestion: (payload: FillQuestionPayload) => ({ type: FILL_QUESTION, payload: payload}),
     ignoreQuestion: () => ({ type: IGNORE_QUESTION}),

@@ -209,6 +209,7 @@ const personByRegionQuery = (code:string)  => `https://dbpedia.org/sparql?query=
 const getSparqlChoice = (theme:string, codeWD: string) => {
   
  // @ts-ignore
+ //bug with hastag char, it needs to be modified after encoding the URL
   const request$ = ajax(encodeURI(queriesMap[theme](codeWD)).replace(/%2523/g,'%23'))
   .pipe(
      map(response => {

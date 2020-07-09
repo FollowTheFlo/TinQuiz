@@ -1,5 +1,5 @@
 {
-  "appId": "io.ionic.starter",
+  "appId": "io.quiz.magnet",
   "appName": "QuizMagnet",
   "bundledWebRuntime": false,
   "npmClient": "npm",

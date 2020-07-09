@@ -1,53 +1,45 @@
 import React, { useContext } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import './Quizes.css';
-import PlaceItem from './../components/PlaceItem';
-import PlaceContext, { Place } from './../data/places-context';
-import { useStore } from '../hooks-store/store';
-
-import useGlobal from '../store';
-import { MyState, MyAssociatedActions} from './../store'
-
-
-import  ActionCreators  from './../redux/actions'
+import { RootState } from '../redux/reducers';
+import { useSelector } from 'react-redux';
+import HistoryItem from '../components/HistoryItem';
+import { historyItem } from '../redux/reducers/UquizReducer';
 
 const Quizes: React.FC = () => {
 
-    // @ts-ignore
-    // const [state, actions] = useGlobal<MyState, MyAssociatedActions>();
-    // console.log('Quizes state:', state );
+  const uQuizState = (state:RootState) => ({
+    historyItems: state.uQuiz.historyItems,
+  });
+  const { historyItems} = useSelector(uQuizState);
+ 
 
-    // const mapState = (state: IState) => ({
-    //   lastUpdated: state.lastUpdated,
-    //   places: state.places
-    // });
-    // const { places } = useMappedState(mapState);
-
-  // const placeCtx = useContext(PlaceContext);
-  // const places = [...placeCtx.places];
-
-  // const state = useStore()[0];
-//console.log('Quizes', state);
   const contentNull = <p>No Places</p>;
 
   //  const content =   places.map((place: Place) => {
   //   // console.log('Quizes2',place)
   //   return (<PlaceItem key={place.id} place={place} />)
   // });
+  const historyContent =   
+  historyItems.map((item: historyItem) => {   
+    return (<HistoryItem 
+      key = {item.id} 
+      historyItem = {item}
+    />)
+    })
+
   
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Quizes</IonTitle>
+          <IonTitle>History</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        {/* {
-          // @ts-ignore
-          places.length > 0 ? content : contentNull
-          
-        } */}
+        {
+          historyItems && historyItems.length>0 && historyContent
+        }
         
       </IonContent>
     </IonPage>

@@ -2,7 +2,8 @@ import { ofType, Epic } from 'redux-observable';
 import { map, catchError, tap, switchMap, mergeMap, concatMap, delay } from 'rxjs/operators';
 import ActionCreators, { Action } from '../actions';
 import { RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST,
-    QUESTIONS_MAP
+    QUESTIONS_MAP,
+    FILL_QUIZ
 } from '../constants';
 import { RunQuestionAction, QuestionParams, RunDistractorAction } from '../actions/quizActions';
 import { getSparqlCountryList, getSparqlRegionList, getSparqlPlaceList } from '../shared/services/distractorSPARQL';
@@ -159,3 +160,21 @@ interface localQuestionParams extends QuestionParams {
                     
                     )
                 }
+
+                export const FillQuizEpic: Epic<Action> = (
+                    action$, state$
+                    ) =>{
+      
+                    return action$.pipe(
+                        ofType<any>(FILL_QUIZ),
+                        tap(() => console.log('EPIC - FILL_QUIZ')),
+                        map((action:any) => { 
+                            const id = Date.now().toString();
+                            return  ActionCreators.quizActions.setQuizId({
+                                quizId:id
+                            })
+                        }),
+                     
+                        
+                        )
+                    }

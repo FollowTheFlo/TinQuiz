@@ -10,9 +10,11 @@ import{
     IGNORE_QUESTION,
     RUN_QUESTION,
     END_QUESTIONS_LIST,
-    CLEAR_QUESTIONS_LIST
+    CLEAR_QUESTIONS_LIST,
+    FILL_QUESTION,
+    SET_QUIZ_ID
     } from "./../constants";
-import { FillQuizAction, FillDistractorAction, FillQuestionAction, RunDistractorAction } from "../actions/quizActions";
+import { FillQuizAction, FillDistractorAction, FillQuestionAction, RunDistractorAction, SetQuizIdAction } from "../actions/quizActions";
 
 export interface Quiz {
     id: string;
@@ -93,6 +95,16 @@ export interface Distractor {
                   }
             };
           }
+          case SET_QUIZ_ID: {
+            console.log('REDUCER - SET_QUIZ_ID: ');
+            const setQuizIdAction = action as SetQuizIdAction;
+            return {              
+                  ...state, quiz: {
+                    ...state.quiz,
+                    id:setQuizIdAction.payload.quizId
+                  }
+            };
+          }
           case RUN_DISTRACTOR: {
             console.log('REDUCER - RUN_DISTRACTOR: ');
 
@@ -105,7 +117,7 @@ export interface Distractor {
                   }
             };
           }
-        case 'FILL_DISTRACTOR': {
+        case FILL_DISTRACTOR: {
           console.log('REDUCER - FILL_DISTRACTOR: ');
           const fillDistractorAction = action as FillDistractorAction;
           return {  
@@ -142,7 +154,7 @@ export interface Distractor {
               }
           };
         }
-        case 'FILL_QUESTION': {
+        case FILL_QUESTION: {
         console.log('REDUCER - FILL_QUESTIONS: ');
         const fillDistractorAction = action as FillQuestionAction;
         //copy of existing question
