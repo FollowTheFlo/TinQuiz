@@ -57,7 +57,9 @@ const getUserLatLng = () => {
       console.log('location ',geoResponse );
       //getReverseGeocode(geoResponse.coords.latitude, geoResponse.coords.longitude);
       return {lat:geoResponse.coords.latitude, lng:geoResponse.coords.longitude};
-     })
+     },
+     error => console.log(error)
+     )
      return from(request);
 }
 

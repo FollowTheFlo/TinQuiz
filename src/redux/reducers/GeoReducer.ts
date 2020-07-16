@@ -1,11 +1,12 @@
 //import { Location} from './../store';
 import { Action } from "../actions";
-import { EndLocationAction } from './../actions/geoActions'
+import { EndLocationAction, SetLocationFromFlagAction } from './../actions/geoActions'
 import{
   START_LOCATION,
   END_LOCATION,
   SHOW_GEO_ERROR,
   CLEAR_GEO_ERROR,
+  SET_LOCATION_FROM_FLAG,
   } from "./../constants";
 
 export interface Location {
@@ -72,9 +73,25 @@ export const locationReducer =  (state:GeoState = initialState, action: Action):
       }
       case CLEAR_GEO_ERROR: {
         console.log('REDUCER - CLEAR_ERROR ');
-        return {
-            // @ts-ignore
+        return {         
           ...state, errorMessage: ""
+        };
+      }
+      case SET_LOCATION_FROM_FLAG: {
+        const setLocationFromFlagAction = action as SetLocationFromFlagAction;
+        console.log('REDUCER - SET_LOCATION_FROM_FLAG ');
+        return {         
+          ...state, location: {
+            id: setLocationFromFlagAction.payload.flag.WdCode,
+            place: '',
+            region: '',
+            country: setLocationFromFlagAction.payload.flag.label,
+            placeWD: '',
+            regionWD: '',
+            countryWD: setLocationFromFlagAction.payload.flag.WdCode,
+            lat: 0,
+            lng: 0,
+          }
         };
       }
 

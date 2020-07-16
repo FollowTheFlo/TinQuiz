@@ -1,25 +1,23 @@
-import React, { useContext } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import React, { useContext, useEffect } from 'react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonSlides, IonSlide } from '@ionic/react';
 import './Quizes.css';
 import { RootState } from '../redux/reducers';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import HistoryItem from '../components/HistoryItem';
 import { historyItem } from '../redux/reducers/UquizReducer';
+import FlagSlide from '../components/FlagSlide';
+import { Flag } from '../redux/reducers/QuizReducer';
+import  ActionCreators  from "../redux/actions";
 
 const Quizes: React.FC = () => {
+
 
   const uQuizState = (state:RootState) => ({
     historyItems: state.uQuiz.historyItems,
   });
-  const { historyItems} = useSelector(uQuizState);
- 
 
-  const contentNull = <p>No Places</p>;
+  const { historyItems } = useSelector(uQuizState);
 
-  //  const content =   places.map((place: Place) => {
-  //   // console.log('Quizes2',place)
-  //   return (<PlaceItem key={place.id} place={place} />)
-  // });
   const historyContent =   
   historyItems.map((item: historyItem) => {   
     return (<HistoryItem 
@@ -28,7 +26,7 @@ const Quizes: React.FC = () => {
     />)
     })
 
-  
+
   return (
     <IonPage>
       <IonHeader>
@@ -37,6 +35,7 @@ const Quizes: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+
         {
           historyItems && historyItems.length>0 && historyContent
         }

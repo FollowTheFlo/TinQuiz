@@ -1,6 +1,6 @@
-import { FILL_QUIZ, FILL_DISTRACTOR, FILL_QUESTION, IGNORE_QUESTION, RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST, END_QUESTIONS_LIST, CLEAR_QUESTIONS_LIST, SET_QUIZ_ID } from "../constants";
+import { FILL_QUIZ, FILL_DISTRACTOR, FILL_QUESTION, IGNORE_QUESTION, RUN_QUESTION, RUN_DISTRACTOR, RUN_QUESTIONS_LIST, END_QUESTIONS_LIST, CLEAR_QUESTIONS_LIST, SET_QUIZ_ID, RUN_FLAGS, FILL_FLAGS, SELECT_FLAG, LAUNCH_QUIZ } from "../constants";
 import { Location } from "../reducers/GeoReducer";
-import { Distractor, Question } from "../reducers/QuizReducer";
+import { Distractor, Question, Flag } from "../reducers/QuizReducer";
 
   //---------Generic Action
   export interface Action {
@@ -35,6 +35,7 @@ export interface SetQuizIdPayload{
     location: Location;
 }
 
+
  /////////FillDistractor
  export interface FillDistractorAction extends Action {
     payload: FillDistractorPayload;
@@ -52,13 +53,45 @@ export interface FillQuestionPayload{
 }
 /////
 export interface QuestionParams {
-  theme: string;
+  topic: string;
   type: string;
   isDistractor: boolean;
 }
 
 export interface RunQuestionAction extends Action {
   params: QuestionParams
+}
+
+///fillFlags
+export interface FillFlagsAction extends Action {
+  payload: FillFlagsPayload
+}
+export interface FillFlagsPayload {
+  flags:Flag[]
+}
+
+///Select Flag
+export interface SelectFlagAction extends Action {
+  payload: SelectFlagPayload
+}
+export interface SelectFlagPayload {
+  WdCode:string
+}
+
+///Run Question List
+export interface RunQuestionsListAction extends Action {
+  params: RunQuestionsListParams
+}
+export interface RunQuestionsListParams {
+  theme:string
+}
+
+///Launch quiz
+export interface LaunchQuizAction extends Action {
+  params: LaunchQuizParams
+}
+export interface LaunchQuizParams {
+  theme:string
 }
 
 
@@ -71,9 +104,13 @@ const ActionCreators = {
     fillQuestion: (payload: FillQuestionPayload) => ({ type: FILL_QUESTION, payload: payload}),
     ignoreQuestion: () => ({ type: IGNORE_QUESTION}),
     runQuestion: (params:QuestionParams) => ({ type: RUN_QUESTION, params: params}),
-    runQuestionsList: () => ({ type: RUN_QUESTIONS_LIST}),
+    runQuestionsList: (params:RunQuestionsListParams) => ({ type: RUN_QUESTIONS_LIST, params: params}),
+    launchQuiz: (params:LaunchQuizParams) => ({ type: LAUNCH_QUIZ, params: params}),
     endQuestionsList: () => ({ type: END_QUESTIONS_LIST}),
     clearQuestionsList: () => ({ type: CLEAR_QUESTIONS_LIST}),
+    runFlags: () => ({ type: RUN_FLAGS}),
+    fillFlags: (payload: FillFlagsPayload) => ({ type: FILL_FLAGS, payload: payload}),
+    selectFlag: (payload: SelectFlagPayload) => ({ type: SELECT_FLAG, payload: payload}),
   }
 
   export default ActionCreators;

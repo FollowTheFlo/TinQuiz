@@ -5,6 +5,7 @@ import{
   START_LOCATION,
   SHOW_GEO_ERROR,
   END_LOCATION,
+  SET_LOCATION_FROM_FLAG,
   } from "./../constants";
 import ActionCreators, { Action } from "./../actions";
 import { getUserLatLng, getPlacefromlatLng } from '../shared/services/geoAPI';
@@ -63,12 +64,12 @@ export const locationEpic: Epic<Action> = (
               let countryWD='';
             if(result.features[0].context.length > 1) {
               const placeIndex = result.features[0].context.findIndex((el:any) => el.id.includes('place'));
-              const regionIndex = result.features[0].context.findIndex((el:any) => el.id.includes('region'));
+              //const regionIndex = result.features[0].context.findIndex((el:any) => el.id.includes('region'));
               const countryIndex = result.features[0].context.findIndex((el:any) => el.id.includes('country'));
               place = placeIndex !== -1 ? result.features[0].context[placeIndex].text : '';
               placeWD = placeIndex !== -1 ? result.features[0].context[placeIndex].wikidata : '';
-              region = regionIndex !== -1 ? result.features[0].context[regionIndex].text : '';
-              regionWD = regionIndex !== -1 ? result.features[0].context[regionIndex].wikidata : '';
+              //region = regionIndex !== -1 ? result.features[0].context[regionIndex].text : '';
+              //regionWD = regionIndex !== -1 ? result.features[0].context[regionIndex].wikidata : '';
               country = countryIndex !== -1 ? result.features[0].context[countryIndex].text : '';
               countryWD = countryIndex !== -1 ? result.features[0].context[countryIndex].wikidata : '';
 
@@ -95,20 +96,37 @@ export const locationEpic: Epic<Action> = (
         
     )
 
-    export const endLocationEpic: Epic<Action> = (
-      action$, state$
-      ) =>
-      action$.pipe(
-          ofType<Action>(END_LOCATION),
-          tap(() => console.log('EPIC - END_LOCATION')),
-          map(() => {
-            return  ActionCreators.quizActions.runDistractor(
-              {
-                location: state$.value.geo.location
-              }
-            );
-          })
-      )
+    // export const endLocationEpic: Epic<Action> = (
+    //   action$, state$
+    //   ) =>
+    //   action$.pipe(
+    //       ofType<Action>(END_LOCATION),
+    //       tap(() => console.log('EPIC - END_LOCATION')),
+    //       map(() => {
+    //         return  ActionCreators.quizActions.runDistractor(
+    //           {
+    //             location: state$.value.geo.location
+    //           }
+    //         );
+    //       })
+    //   )
+
+      // export const setLocationFromFlagEpic: Epic<Action> = (
+      //   action$, state$
+      //   ) =>
+      //   action$.pipe(
+      //       ofType<Action>(SET_LOCATION_FROM_FLAG),
+      //       tap(() => console.log('EPIC - SET_LOCATION_FROM_FLAG')),
+      //       map(() => {
+      //         const location = {...state$.value.geo.location};
+      //         console.log('Epic SET_LOCATION_FROM_FLAG',location);
+      //         return  ActionCreators.quizActions.runDistractor(
+      //           {
+      //             location
+      //           }
+      //         );
+      //       })
+      //       )
 
 
 

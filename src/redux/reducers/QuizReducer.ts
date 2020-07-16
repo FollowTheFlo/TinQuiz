@@ -12,9 +12,15 @@ import{
     END_QUESTIONS_LIST,
     CLEAR_QUESTIONS_LIST,
     FILL_QUESTION,
-    SET_QUIZ_ID
+    SET_QUIZ_ID,
+    RUN_FLAGS,
+    FILL_FLAGS,
+    SELECT_FLAG,
+    LAUNCH_QUIZ
     } from "./../constants";
-import { FillQuizAction, FillDistractorAction, FillQuestionAction, RunDistractorAction, SetQuizIdAction } from "../actions/quizActions";
+import { FillQuizAction, FillDistractorAction, FillQuestionAction, RunDistractorAction, SetQuizIdAction, FillFlagsAction, SelectFlagAction, LaunchQuizAction } from "../actions/quizActions";
+import { flag, flagSharp } from "ionicons/icons";
+import FlagSlide from "../../components/FlagSlide";
 
 export interface Quiz {
     id: string;
@@ -23,21 +29,22 @@ export interface Quiz {
     questions: Question[];
     distractor: Distractor;
     location: Location;
+    theme:string;
   };
 
 export interface Distractor {
-    place: string;
-    placeWD: string;
-    region: string;
-    regionWD: string;
-    country: string;
-    countryWD: string;
+    place: string[];
+    placeWD: string[];
+    region: string[];
+    regionWD: string[];
+    country: string[];
+    countryWD: string[];
 }
 
   export interface Question {
       id: string;
       geoType: string;
-      theme: string
+      topic: string
       phrase: string;
       subPhrase: string;
       correct: boolean;
@@ -47,17 +54,36 @@ export interface Distractor {
   }
 
   export interface QuizState {
+    selectedFlag: Flag,
+    loadingFlags: boolean
+    flags: Flag[],
     quiz: Quiz,
     errorMessage: string,
     loading: boolean,
   }
 
+  export interface Flag {
+    label:string,
+    image:string,
+    WdCode:string,
+    isSelected:boolean,
+  }
+
   const initialState = {
+      flags: [],
+      loadingFlags: true,
+      selectedFlag: {
+        label:'France',
+        image:'image',
+        WdCode:'Q142',
+        isSelected:true,
+      },
       quiz: {
         id: '0',
         subject: 'yo',
         locale: 'en',
         questions: [],
+        theme: 'ALL',
         location: {id:'0',
             place:'Saint-James',
             region:'Manche',
@@ -68,12 +94,12 @@ export interface Distractor {
             lat:-1.325183,
             lng:48.523252},
         distractor: {
-            place: 'Montreal',
-            placeWD: 'Q340',
-            region: 'Quebec',
-            regionWD: 'Q176',
-            country: 'United Kingdom',
-            countryWD: 'Q145',
+            place: ['Montreal'],
+            placeWD: ['Q340'],
+            region: ['Quebec'],
+            regionWD: ['Q176'],
+            country: ['United Kingdom'],
+            countryWD: ['Q145'],
         },
     },
       errorMessage:'',
@@ -91,7 +117,7 @@ export interface Distractor {
                   ...state, loading:true, quiz: {
                     ...state.quiz,
                     location: fillQuizAction.payload.location,
-                    subject: `${fillQuizAction.payload.location.place} - ${fillQuizAction.payload.location.region} - ${fillQuizAction.payload.location.country}`
+                    subject: `${fillQuizAction.payload.location.country}`
                   }
             };
           }
@@ -103,6 +129,16 @@ export interface Distractor {
                     ...state.quiz,
                     id:setQuizIdAction.payload.quizId
                   }
+            };
+          }
+          case LAUNCH_QUIZ: {
+            console.log('REDUCER - LAUNCH_QUIZ: ');
+            const launchQuizAction = action as LaunchQuizAction;
+            return {  
+                ...state, loading:true, quiz: {
+                  ...state.quiz,
+                  theme:launchQuizAction.params.theme
+                }
             };
           }
           case RUN_DISTRACTOR: {
@@ -177,6 +213,36 @@ export interface Distractor {
           return {  
               ...state
           };
+          }
+          case RUN_FLAGS: {
+            console.log('REDUCER - RUN_FLAGS: ');
+            
+            return {  
+                ...state, loadingFlags:true
+            };
+          }
+          case FILL_FLAGS: {
+            const fillFlagsAction = action as FillFlagsAction;
+            console.log('REDUCER - FILL_FLAGS: ', fillFlagsAction.payload.flags);
+            
+            return {  
+                ...state, flags:fillFlagsAction.payload.flags, loadingFlags:false
+            };
+          }
+          case SELECT_FLAG: {
+            const selectFlagAction = action as SelectFlagAction;
+            console.log('REDUCER - SELECT_FLAG: ', selectFlagAction.payload.WdCode);
+     
+            const updatedFlags = [...state.flags];
+            const index = updatedFlags.findIndex(f => f.WdCode === selectFlagAction.payload.WdCode);
+            updatedFlags.forEach(f => f.isSelected = false);
+            if(index !== -1) {
+              updatedFlags[index].isSelected = true;
+            }
+            
+            return {  
+                ...state, flags:updatedFlags, selectedFlag:{...updatedFlags[index]}
+            };
           }
         default:
             return state;

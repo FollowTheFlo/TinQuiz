@@ -11,6 +11,53 @@ export interface Article {
     image: string;
 }
 
+const getFilmfromCountryOrigin = (code:string)  => {
+  const proxyurl = "https://quiz-magnet.herokuapp.com/";
+  
+  const query = `SELECT distinct ?imdb WHERE{
+  wd:${code} wdt:P37 ?officialLanguage.
+  ?film wdt:P31 wd:Q11424.
+  ?film wdt:P1476 ?title.
+  ?film wdt:P495 wd:${code}.
+  ?film wdt:P495 ?country.
+  ?film wdt:P577 ?releaseDate.
+  ?film wdt:P1258 ?rottenTomatoes.
+  ?film wdt:P345 ?imdb.
+  ?film wdt:P136 ?genre.
+  FILTER ( ?genre != wd:Q93204)        
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en".}}
+  GROUP BY ?film ?title ?officialLanguage ?releaseDate ?imdb
+  HAVING (COUNT(distinct ?country) < 2)
+  ORDER BY DESC(?releaseDate)
+  LIMIT 50`
+
+  const  request$ = ajax(
+    {
+        url: proxyurl + 'https://query.wikidata.org/sparql', 
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/sparql-query',
+            'Accept': 'application/sparql-results+json'
+        },
+        body: query
+    }
+  ).pipe(
+    map((response:any) => {
+      if(response.response.results.bindings.length === 0) {
+        return '';
+      }
+        console.log('response: ', response.response.results.bindings)
+        return response.response.results.bindings[randomIntFromInterval(0,response.response.results.bindings.length-1)].imdb.value;
+    
+    }),
+    catchError(error => {
+      console.log('error: ', error);
+      return of(error);
+    })
+  )
+return request$;
+}
+
 const getImdbFromWD = (filmWD: string) => {
 
     const proxyurl = "https://quiz-magnet.herokuapp.com/";
@@ -95,7 +142,7 @@ SELECT DISTINCT ?film ?filmLabel ?subjectCount as ?Popularity (COUNT(distinct ?f
   LIMIT 10 &format=json`;
 
   /////////
-  const getSparqlFilmChoice = (theme:string, codeWD: string) => {
+  const getSparqlFilmChoice2 = (topic:string, codeWD: string) => {
   
  
     const request$ = ajax(encodeURI(FilmByCountryQuery(codeWD)).replace(/%2523/g,'%23'))
@@ -139,7 +186,39 @@ SELECT DISTINCT ?film ?filmLabel ?subjectCount as ?Popularity (COUNT(distinct ?f
     return request$;
   }
   ////////
-
+  const getSparqlFilmChoice = (topic:string, codeWD: string) => {
+  
+ 
+    const request$ = getFilmfromCountryOrigin(codeWD)
+    .pipe(
+       map(codeIMDB => {
+           console.log('getSparqlFilmChoice response: ', codeIMDB);
+           return codeIMDB;
+       
+       }),
+  
+   concatMap((codeIMDB:string) => {
+    console.log('Pipe getFilmFromImdb',codeIMDB);
+    if(codeIMDB === '') {
+      return of({ 
+        film: '',
+        label: '',
+        })
+    }
+    return getFilmFromImdb(codeIMDB);
+}),
+    map((filmChoice: Article)=> {
+        console.log('filmChoice', filmChoice);
+        return filmChoice
+    }),
+  
+    catchError(error => {
+        console.log('error: ', error);
+        return of(error);
+    })
+       );
+    return request$;
+  }
   
 
   export {

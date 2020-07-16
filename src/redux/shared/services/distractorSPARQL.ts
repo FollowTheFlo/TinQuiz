@@ -50,11 +50,15 @@ ORDER BY DESC(?population)
                     code: el.country.value.replace("http://www.wikidata.org/entity/",""),
                     }
                 })
-            //const index = fullList.findIndex(el => el.code === countryWD);
-            return fullList[randomIntFromInterval(0,fullList.length-1)];
-            //get the DBPedia article from WikiData code
-            //return getDBPfromWD(selectedCountry.code);
-            
+                // get 5 random countries to make Distractor experience better
+            return [
+              fullList[randomIntFromInterval(0,fullList.length-1)],
+              fullList[randomIntFromInterval(0,fullList.length-1)],
+              fullList[randomIntFromInterval(0,fullList.length-1)],
+              fullList[randomIntFromInterval(0,fullList.length-1)],
+              fullList[randomIntFromInterval(0,fullList.length-1)],
+            ];
+           
         }),
         catchError(error => {
           console.log('error: ', error);
@@ -106,7 +110,11 @@ ORDER BY DESC(?population)
                     }
                 })
             //const index = fullList.findIndex(el => el.code === regionWD);
-            return fullList[randomIntFromInterval(0,fullList.length-1)];
+            return [
+              fullList[randomIntFromInterval(0,fullList.length-1)],
+              fullList[randomIntFromInterval(0,fullList.length-1)],
+              fullList[randomIntFromInterval(0,fullList.length-1)],
+            ];
          
             //get the DBPedia article from WikiData code
            // return getDBPfromWD(selectedRegion.code);
@@ -174,7 +182,7 @@ ORDER BY DESC(?population)
        map(codeWD => {
        selectedPlace.code = codeWD.replace("http://www.wikidata.org/entity/","");
        console.log('selectedPlace***********************', selectedPlace);
-        return selectedPlace;
+        return [selectedPlace,selectedPlace,selectedPlace];
     }),
        catchError(error => {
          console.log('error: ', error);
@@ -185,35 +193,6 @@ ORDER BY DESC(?population)
     return request$;
   }
 
-  const getDBPfromWD = (placeWD: string) => {
-    console.log('getDBPfromWD', placeWD);
-    const queryEntityWD = `https://dbpedia.org/sparql?query=
-    PREFIX owl:<http://www.w3.org/2002/07/owl%23>
-    SELECT ?targetDBP
-    {
-        ?targetDBP owl:sameAs <http://www.wikidata.org/entity/${placeWD}>
-    }
-    LIMIT 1&format=json`;
-    const request$ = ajax(encodeURI(queryEntityWD).replace(/%2523/g,'%23'))
-    .pipe(
-       map(response => {
-           console.log('DBPEDIA response: ', response);
-           return response.response.results.bindings[0].targetDBP.value;
-       
-       }),      
-
-    catchError(error => {
-        console.log('error: ', error);
-        return of(error);
-    })
-       );
-    return request$;
-  }
-
-
-
-  
-  
 
   export {
     getSparqlCountryList,

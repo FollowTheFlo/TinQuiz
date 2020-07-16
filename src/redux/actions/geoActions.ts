@@ -5,7 +5,9 @@ import{
   SHOW_GEO_ERROR,
   CLEAR_GEO_ERROR,
   FILL_QUIZ,
+  SET_LOCATION_FROM_FLAG,
   } from "./../constants";
+import { Flag } from '../reducers/QuizReducer';
 
 
   export interface Coordinates {
@@ -29,12 +31,20 @@ import{
           location: Location;
   }
 
+  //------------SetLocationFromFlag
+  export interface SetLocationFromFlagAction extends Action {
+    payload: SetLocationFromFlagPayload
+  }
+  export interface SetLocationFromFlagPayload{
+          flag: Flag;
+  }
+
   const ActionCreators = {
-    startLocation: () => ({ type: START_LOCATION}),   
+    startLocation: () => ({ type: START_LOCATION}),
+    setLocationFromFlag: (payload: SetLocationFromFlagPayload) => ({ type: SET_LOCATION_FROM_FLAG,payload: payload}),
     endLocation: (payload: EndLocationPayload) => ({ type: END_LOCATION,payload: payload}),
     showGeoErrorMessage: (payload: string ) => ({ type: SHOW_GEO_ERROR, payload: payload }),
     clearGeoErrorMessage: () => ({ type: CLEAR_GEO_ERROR}),
-    fillQuiz: (payload: Location) => ({ type: FILL_QUIZ, payload: payload}),
   }
 
   export default ActionCreators;

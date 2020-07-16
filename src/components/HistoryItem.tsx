@@ -10,7 +10,7 @@ const HistoryItem: React.FC<{ historyItem: historyItem, key:string}> = props => 
     <IonCard 
     >
       <IonCardHeader >
-        <IonCardTitle>{props.historyItem.subject}</IonCardTitle>
+        <IonCardTitle>{props.historyItem.country} - Theme: {props.historyItem.theme}</IonCardTitle>
         <IonCardSubtitle>{props.historyItem.score}%</IonCardSubtitle>
       </IonCardHeader>
     </IonCard>
