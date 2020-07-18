@@ -28,6 +28,7 @@ export const FILL_FLAGS = 'FILL_FLAGS';
 export const SELECT_FLAG = 'SELECT_FLAG';
 
 export const GO_NEXT_QUESTION = 'GO_NEXT_QUESTION';
+export const EMPTY_ACTION = 'EMPTY_ACTION';
 export const START_QUIZ = 'START_QUIZ';
 export const END_QUIZ = 'END_QUIZ';
 export const SHOW_QUIZ = 'SHOW_QUIZ';
@@ -52,7 +53,7 @@ export const QUESTIONS_MAP:any = {
     'personByCountry' : 'Person from',
     'animalByCountry' : 'Animal from ',
     'riverByCountry' : 'River from',
-    'footballerByCountry' : 'Footballer born in',
+    'footballerByCountry' : 'Footballer of',
     'actorByCountry' : 'Actor from',
     'bandByCountry' : 'Music band from',
     'location' : 'Is it',
@@ -60,7 +61,7 @@ export const QUESTIONS_MAP:any = {
     'capitalByCountry' : 'Capital of',
     'townByCountry' : 'City of',
     'mountainByCountry' : 'Mountain of',
-    'logoByCountry' : 'Company of France',
+    'logoByCountry' : 'Company of',
 }
 
 //filmByCountry as optional as handle separately,see filmSPARQL.ts

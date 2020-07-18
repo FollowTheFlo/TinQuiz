@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonLabel, IonItem, IonInput, IonSpinner, IonAlert, IonToggle, IonSlides, IonSegment, IonSegmentButton, IonSearchbar, IonList } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonLabel, IonItem, IonSpinner, IonAlert, IonSlides, IonSearchbar, IonList, 
+  Gesture, GestureConfig, createGesture, IonCard, IonCardHeader, IonModal
+} from '@ionic/react';
 import './Home.css';
 //import { useDispatch, useMappedState } from "redux-react-hook";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
@@ -18,14 +20,17 @@ import SearchItem from '../components/SearchItem';
 import ThemeSegments from '../components/ThemeSegments';
 import { useKeyboardState } from '@ionic/react-hooks/keyboard';
 import { Theme } from '../redux/constants';
+import { ReactNode} from 'react';
+import useWindowSize from '../redux/custom-hooks/windowSize-hook';
 
 
 const Home: React.FC = () => {
 
   const slidesRef = useRef<HTMLIonSlidesElement>(null);
   const boxRef = useRef<HTMLIonSearchbarElement>(null);
-  //const slidesRef = useRef();
   
+
+   
   const qwantState = (state: RootState) => ({
     qwantLoading: state.qwant.qwantLoad,
     articles: state.qwant.qwantArticles,
@@ -78,6 +83,7 @@ const Home: React.FC = () => {
    const { isOpen, keyboardHeight } = useKeyboardState();
    const [quizTheme, setQuizTheme] = useState(Theme.ALL.toString());
 
+   const { width } = useWindowSize();
   //actions dispatcher
   const dispatch = useDispatch(); 
 
@@ -100,7 +106,7 @@ const Home: React.FC = () => {
     console.log('useEffect selectedFlag',selectedFlag.WdCode);
     if(slidesRef.current?.slideTo && selectedFlag.WdCode !== undefined) {
       //find index of selected flag
-      console.log('In Condition', selectedFlag.WdCode);
+      console.log('In Condition FLAGS', flags);
       let index = flags.findIndex(f => f.WdCode === selectedFlag.WdCode);
       //there are 3 flags in screen, set the selected one in the middle, so poisition index-1
       index = index === 0 ? index : index - 1
@@ -111,26 +117,24 @@ const Home: React.FC = () => {
 
    useEffect(() => {
     dispatch(ActionCreators.quizActions.runFlags());
-   // setPageLoaded(false);
+    
    },[])
   
-   useEffect(() => {
-   
+   useEffect(() => {   
     if(!loadingFlags && slidesRef.current?.slideTo) {
     console.log('useEffect flags1');
     console.log('selectFlag2');
       dispatch(ActionCreators.quizActions.selectFlag({
         WdCode: location.countryWD
-      }));
- 
+      })); 
     }
    
    },[loadingFlags])
 
-   useEffect(() => {
-console.log('keyboardHeight',keyboardHeight);
-console.log('keyboard isOpen',isOpen);
-   },[isOpen,keyboardHeight])
+//    useEffect(() => {
+// console.log('keyboardHeight',keyboardHeight);
+// console.log('keyboard isOpen',isOpen);
+//    },[isOpen,keyboardHeight])
 
 
 //////////buttons handlers
@@ -172,17 +176,17 @@ const clickYesHandler = (currentQuestion:Question) => {
       }}
     ));
   }  
-  if(questionIndex === questions.length - 1) {
-    dispatch(ActionCreators.userQuizActions.endQuiz(
-      {
-        quiz: currentQuiz
-      }
-    ));
-  }
+  // if(questionIndex === questions.length - 1) {
+  //   dispatch(ActionCreators.userQuizActions.endQuiz(
+  //     {
+  //       quiz: currentQuiz
+  //     }
+  //   ));
+  // }
 }
 
 const clickNoHandler = (currentQuestion:Question) => {
-  console.log('clickYesHandler', currentQuestion.id);
+  console.log('clickYesHandler');
   if(questionIndex < questions.length) {
     dispatch(ActionCreators.userQuizActions.goNextQuestion(
       { uAnswer:{
@@ -192,13 +196,13 @@ const clickNoHandler = (currentQuestion:Question) => {
        }}
     ));
   }
-  if(questionIndex === questions.length - 1) {
-    dispatch(ActionCreators.userQuizActions.endQuiz(
-      {
-        quiz: currentQuiz
-      }
-    ));
-  }
+  // if(questionIndex === questions.length - 1) {
+  //   dispatch(ActionCreators.userQuizActions.endQuiz(
+  //     {
+  //       quiz: currentQuiz
+  //     }
+  //   ));
+  // }
 }
 
 const hideQuiz = () => {
@@ -211,7 +215,19 @@ const SearchBoxValueChangedHandler = (input:string) => {
   console.log('getSearchBoxValue',input);
 
   setSearchText(input);
-  if(input==='' || (isFlagSelected && flags.findIndex(flag => flag.label === input) !== -1)) {
+
+  if( flags.filter(flag => flag.label.toLowerCase() === input.toLowerCase()).length === 1) {
+    const targetFlag = flags.filter(flag => flag.label.toLowerCase() === input.toLowerCase())
+    dispatch(ActionCreators.geoActions.setLocationFromFlag({flag:targetFlag[0]}));
+  dispatch(ActionCreators.quizActions.selectFlag({
+    WdCode: targetFlag[0].WdCode
+  }));
+  }
+  if(input==='' || 
+    (isFlagSelected && flags.findIndex(flag => flag.label === input) !== -1)||
+    flags.filter(flag => flag.label.toLowerCase() === input.toLowerCase()).length > 0
+  
+  ) {
     setIsTyping(false);
     return;
   }
@@ -237,12 +253,6 @@ const onClearSearchBox = () => {
   setIsTyping(false);
 }
 
-const setFocusOnBox = async() => {
-  if(boxRef.current?.setFocus) {
-    console.log('setFocusOnBox', boxRef.current?.value);
-   await boxRef.current?.setFocus();
-   }
- }
 
   //////Flags
   const selectFlagHandler = (flag:Flag) => {
@@ -290,7 +300,7 @@ const resultScore = <h2>Finished with {totalScore}%</h2>;
 const loadingQuestionsSpinner = (<div><IonSpinner name='lines'/> <p>Loading Questions</p></div>)
 
 const questionsSlides = 
-    (<div><IonRow >
+    (<IonGrid><IonRow >
     <IonCol size="10">          
     {
       questions.length > 0  && currentScore
@@ -310,13 +320,13 @@ const questionsSlides =
     {
         questions.length > 0 && questions[questionIndex] && <QuestionItem
             key = {questions[questionIndex].id} 
-            question = {questions[questionIndex]}
+            question = {questions[questionIndex]}           
             clickYes = {clickYesHandler}
             clickNo = {clickNoHandler}
               /> 
     }
     </IonCol>
-    </IonRow></div>);
+    </IonRow></IonGrid>);
 
 
 
@@ -334,24 +344,34 @@ const questionsSlides =
           buttons={['OK']}
         />
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar id='homeToolbar'>
           <IonTitle>TinQuiz</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
+      <IonContent id='homePage'>
         <IonGrid>
 
 {
-  !isFinished && isQuizOpened && questionsSlides
+  // <IonModal 
+  // id='MyModal'
+  // isOpen={!isFinished && isQuizOpened }
+  // onDidDismiss={() => hideQuiz()}
+  // swipeToClose={true}
+  // >
+  //   <IonButton onClick={() => hideQuiz()}>Close Modal</IonButton>
+  //   {questionsSlides}
+    
+  //   </IonModal>
 
 }
+{!isFinished && isQuizOpened && questionsSlides }
 
  
             <IonRow>
            <IonCol offset="0" size="12">
            {
              !isQuizOpened &&
-             <IonSlides pager={false} options={slideOpts} ref={slidesRef}>
+             <IonSlides id='flagsSlide' pager={false} options={slideOpts} ref={slidesRef}>
               {
                 flags && flags.length>0 && flagSlides
               }
@@ -376,10 +396,14 @@ const questionsSlides =
  { !isQuizOpened &&  <IonRow className="ion-margin-top">
             <IonCol size="9">
           
-                    <span>
-    <IonItem>
+                   
+    <IonItem 
+      lines='none'
+      class='backGroundStyle'
+      >
                
-                <IonSearchbar 
+                <IonSearchbar
+               
                 type="text" 
                 debounce={500} 
                 ref={boxRef}
@@ -388,16 +412,19 @@ const questionsSlides =
                 onIonChange={e => SearchBoxValueChangedHandler(e.detail.value!)}
                 ></IonSearchbar>
             </IonItem>
-                <IonList>
+
+            {isTyping && suggestionCountryList.length>0 && 
+                <IonList lines='none'  
+                  class='backGroundStyle'>
                     
-                {isTyping && suggestionCountryList.length>0 && suggestionCountryList.slice(0,5).map(flag => <SearchItem
+               { suggestionCountryList.slice(0,5).map(flag => <SearchItem
                   key={flag.WdCode}
                   flag = {flag}
                   selectItem = {selectSuggestionItem}
 
                   />)}
-                 </IonList>
- </span> 
+                 </IonList>}
+ 
               
             </IonCol>
             <IonCol >
@@ -410,7 +437,10 @@ const questionsSlides =
           { !isQuizOpened &&
           <IonRow className="ion-margin-top">
             <IonCol offset="2" size="8">
-                  <IonButton onClick={()=>runQuestions(location)}>
+                  <IonButton 
+                  size='large'
+                    expand="full"
+                    onClick={()=>runQuestions(location)}>
                   <IonLabel>Launch Quiz</IonLabel>
                 </IonButton>
               </IonCol>

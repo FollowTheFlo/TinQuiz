@@ -1,7 +1,7 @@
 import { Choice } from './ChoiceReducer';
 import { Action } from '../actions/quizActions';
 import { GoNextQuestionAction, StartQuizPayload, StartQuizAction, EndQuizAction, ShowQuizAction } from '../actions/userQuizActions';
-import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ } from '../constants';
+import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ, EMPTY_ACTION } from '../constants';
 import { Question, Quiz } from './QuizReducer';
 
 export interface Uanswer {
@@ -77,6 +77,12 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
                   uAnswers: state.uAnswers.concat(goNextQuestionAction.payload.uAnswer)
             };
           }
+          case EMPTY_ACTION: {
+              console.log('REDUCER - EMPTY_ACTION: '); 
+              return {              
+                    ...state
+              };
+            }
         
         case START_QUIZ: {
           

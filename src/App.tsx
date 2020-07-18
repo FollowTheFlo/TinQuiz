@@ -54,6 +54,7 @@ const App: React.FC = () => {
     <Provider store={store}>
   <IonApp>
     <IonReactRouter>
+      <div id="mainTabs">
       <IonTabs>
         <IonRouterOutlet>
           <Route path="/home" component={Home} exact={true} />
@@ -61,17 +62,18 @@ const App: React.FC = () => {
           <Route path="/tab3" component={Tab3} />
           <Route path="/" render={() => <Redirect to="/home" />} exact={true} />
         </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="home" href="/home">
+        <IonTabBar slot="bottom" class="foreGroundStyle" >
+          <IonTabButton tab="home" href="/home" class="tabButtonStyle">
             <IonIcon icon={home} />
             <IonLabel>Home</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="quizes" href="/quizes">
+          <IonTabButton tab="quizes" href="/quizes" class="tabButtonStyle">
             <IonIcon icon={ellipse} />
             <IonLabel>History</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
+      </div>
     </IonReactRouter>
   </IonApp>
   </Provider>

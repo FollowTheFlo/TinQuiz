@@ -1,4 +1,4 @@
-import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ } from "../constants";
+import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ, EMPTY_ACTION } from "../constants";
 import { Uanswer} from '../reducers/UquizReducer';
 import { Quiz } from "../reducers/QuizReducer";
 
@@ -39,6 +39,7 @@ import { Quiz } from "../reducers/QuizReducer";
 
 const ActionCreators = {
   goNextQuestion: (payload: GoNextQuestionPayload) => ({ type: GO_NEXT_QUESTION, payload: payload}),
+  emptyAction: () => ({ type: EMPTY_ACTION }),
   startQuiz: () => ({ type: START_QUIZ }),
   endQuiz: (payload: StartQuizPayload) => ({ type: END_QUIZ, payload: payload}),
   showQuiz: (payload: boolean) => ({ type: SHOW_QUIZ, payload: payload})

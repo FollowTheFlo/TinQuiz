@@ -2,9 +2,12 @@ import { ajax } from "rxjs/ajax";
 import { map, catchError } from "rxjs/operators";
 import { of } from "rxjs";
 import { Flag } from "../../reducers/QuizReducer";
+import { localFlagsList } from "../config/flagsList";
 
 const getSparqlFlagList = (countryWDList: string[]) => {
     console.log('getSparqlFlagList1',countryWDList);
+
+    return of(localFlagsList);
     let countryWdListstring = '';
     countryWDList.forEach(codeURI => countryWdListstring+=`<${codeURI}>,`);
     console.log('getSparqlFlagList2',countryWdListstring);

@@ -40,7 +40,7 @@ const QuestionsList: React.FC<{
     {
         props.questions.length > 0 && props.questions[props.questionIndex] && <QuestionItem
             key = {props.questions[props.questionIndex].id} 
-            question = {props.questions[props.questionIndex]}
+            question = {props.questions[props.questionIndex]}          
             clickYes = {props.clickYesHandler}
             clickNo = {props.clickNoHandler}
               /> 

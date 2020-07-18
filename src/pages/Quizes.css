@@ -1,0 +1,9 @@
+#badgesToolbar {
+    --background: var(--ion-color-primary);
+    --color:white;
+    text-align: center;
+  }
+
+  .backGroundStyle {
+    --background: #c7b2ad;
+  }

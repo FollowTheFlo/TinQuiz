@@ -30,11 +30,11 @@ const Quizes: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar id="badgesToolbar">
           <IonTitle>History</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
+      <IonContent class="backGroundStyle">
 
         {
           historyItems && historyItems.length>0 && historyContent

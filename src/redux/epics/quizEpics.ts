@@ -24,6 +24,7 @@ import { questionGeoList } from '../shared/config/queriesGeoList';
 import { questionCelebList } from '../shared/config/queriesCelebList';
 import { questionFoodList } from '../shared/config/queriesFoodList';
 import { questionEnterpriseList } from '../shared/config/queriesEnterpriseList';
+import { localFlagsList } from '../shared/config/flagsList';
 
 
 export const quizEpic: Epic<Action> = (
@@ -280,43 +281,48 @@ interface localQuestionParams extends QuestionParams {
                 export const RunFlagsEpic: Epic<Action> = (
                     action$, state$
                     ) =>{
-        
+                    
                     return action$.pipe(
                         ofType<any>(RUN_FLAGS),
                         tap(() => console.log('EPIC - RUN_FLAGS')),
-                        concatMap((action:Action) => { 
-                        //set any country as parameter, just use to get Hypernym in getSparqlCountryWDCodeURIs
-                              return getSparqlCountryWDCodeURIs('Q30');
-                                
-                             
-                             } ),
-                        concatMap((response:any[]) => {
-                        console.log('RUN_FLAGS response', response);
-                        if(!response) {
-                            //return of(ActionCreators.geoActions.showGeoErrorMessage("getSparqlFlagList Error"));
-                            console.log('response is null');
-                            return of([]);
-                        }
-                        return getSparqlFlagList(response)
-                        .pipe(
-                            catchError( error => {
-                               console.log("getUserLatLng",error.message);
-                               return of(ActionCreators.geoActions.showGeoErrorMessage("getSparqlFlagList Error"));
-                             }),
-                            )
-                        
-                        }),
-                        map((flags:Flag[]) => {
-                           
-                            const countryWD = state$.value.quiz.quiz.location.countryWD;
-                            console.log('Flags', flags, countryWD);
-                            flags.forEach(f => {
-                              f.isSelected =  f.WdCode === countryWD ? true : false;
-                            });
+                        map(() => {
                             return ActionCreators.quizActions.fillFlags({
-                                flags: flags
+                                flags: localFlagsList
                             });
                         })
+                        // concatMap((action:Action) => { 
+                        // //set any country as parameter, just use to get Hypernym in getSparqlCountryWDCodeURIs
+                        //       return getSparqlCountryWDCodeURIs('Q30');
+                                
+                             
+                        //      } ),
+                        // concatMap((response:any[]) => {
+                        // console.log('RUN_FLAGS response', response);
+                        // if(!response) {
+                        //     //return of(ActionCreators.geoActions.showGeoErrorMessage("getSparqlFlagList Error"));
+                        //     console.log('response is null');
+                        //     return of([]);
+                        // }
+                        // return getSparqlFlagList(response)
+                        // .pipe(
+                        //     catchError( error => {
+                        //        console.log("getUserLatLng",error.message);
+                        //        return of(ActionCreators.geoActions.showGeoErrorMessage("getSparqlFlagList Error"));
+                        //      }),
+                        //     )
+                        
+                        // }),
+                        // map((flags:Flag[]) => {
+                           
+                        //     const countryWD = state$.value.quiz.quiz.location.countryWD;
+                        //     console.log('Flags', flags, countryWD);
+                        //     flags.forEach(f => {
+                        //       f.isSelected =  f.WdCode === countryWD ? true : false;
+                        //     });
+                        //     return ActionCreators.quizActions.fillFlags({
+                        //         flags: flags
+                        //     });
+                        // })
                         
                         
                         )

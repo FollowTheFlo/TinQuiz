@@ -14,6 +14,7 @@ const SearchItem: React.FC<{
 console.log('country',props.flag);
   return (
     <IonItem
+    class='backGroundStyle'
     onClick = {props.selectItem.bind(null, props.flag)}
     >
         {props.flag.label}       
