@@ -20,7 +20,7 @@ export const goNextQuestionEpic: Epic<Action> = (
             console.log('EPIC - GO_NEXT_QUESTION Length',state$.value.quiz.quiz.questions.length);
             console.log('EPIC - GO_NEXT_QUESTION index',state$.value.uQuiz.questionIndex);
             if(state$.value.uQuiz.questionIndex ===state$.value.quiz.quiz.questions.length) {
-                return ActionCreators.userQuizActions.endQuiz({quiz:state$.value.quiz.quiz});
+                return ActionCreators.userQuizActions.endQuiz({quiz:state$.value.quiz.quiz, countryImg:state$.value.quiz.selectedFlag.image});
 
             }
             return ActionCreators.userQuizActions.emptyAction();

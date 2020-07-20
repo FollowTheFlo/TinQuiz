@@ -1,7 +1,7 @@
 import { Choice } from './ChoiceReducer';
 import { Action } from '../actions/quizActions';
-import { GoNextQuestionAction, StartQuizPayload, StartQuizAction, EndQuizAction, ShowQuizAction } from '../actions/userQuizActions';
-import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ, EMPTY_ACTION } from '../constants';
+import { GoNextQuestionAction, StartQuizPayload, StartQuizAction, EndQuizAction, ShowQuizAction, ShowResultPanelAction } from '../actions/userQuizActions';
+import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ, EMPTY_ACTION, SHOW_RESULT_PANEL } from '../constants';
 import { Question, Quiz } from './QuizReducer';
 
 export interface Uanswer {
@@ -10,7 +10,7 @@ export interface Uanswer {
   isCorrect: boolean;
 }
 
-export interface historyItem {
+export interface HistoryItem {
   id: string;
   subject: string;
   country: string;
@@ -21,15 +21,27 @@ export interface historyItem {
   correctAnswersCount: number;
 }
 
+export interface Badge {
+  id: string,
+  award: string;
+  country: string;
+  countryWD: string;
+  countryImg: string;
+  theme: string;
+  score: number;
+}
+
 export interface UquizState {
   quiz:Quiz;
   questionIndex:number;
   isOpened:boolean;
+  showResultPanel:boolean;
   uAnswers:Uanswer[];
   isFinished:boolean;
   score:number;
   userId:string;
-  historyItems:historyItem[];
+  historyItems:HistoryItem[];
+  badges:Badge[];
 }
 
 const initialState = {
@@ -61,9 +73,11 @@ const initialState = {
     uAnswers:[],
     isFinished:false,
     isOpened:false,
+    showResultPanel:false,
     score:0,
     userId:'Flo',
     historyItems:[],
+    badges:[],
 }
 
 export const uQuizReducer =  (state:UquizState = initialState, action: Action): UquizState => {
@@ -101,8 +115,31 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
             const correctAnswersCount = state.uAnswers.filter(answer => answer.isCorrect === true).length;
             const totalAnswers = state.uAnswers.length;
             const totalScore = (Math.trunc (10000 * (correctAnswersCount / totalAnswers )))/100;
+            let newBadgeList:Badge[] = [...state.badges];
+           
+            if(totalScore >= 80 )
+            {
+                const badge:Badge = {
+                  id: Date.now().toString(),
+                  award: 'Bronze',               
+                  score: totalScore,
+                  country: endQuizPayload.payload.quiz.location.country,
+                  countryImg: endQuizPayload.payload.countryImg,
+                  countryWD: endQuizPayload.payload.quiz.location.countryWD,
+                  theme: endQuizPayload.payload.quiz.theme,
+                }
+              
+                if(totalScore === 100) {
+                  badge.award= 'Gold';
+                } else if(totalScore >= 90) {
+                  badge.award= 'Silver';
+                }
+                newBadgeList = [...state.badges].concat(badge);
+            }
+
             return {              
                   ...state,
+                  showResultPanel:true,
                   isFinished:true,
                   isOpened:false,
                   quiz: endQuizPayload.payload.quiz,
@@ -117,8 +154,10 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
                     country: endQuizPayload.payload.quiz.location.country,
                     countryWD: endQuizPayload.payload.quiz.location.countryWD,
                     theme: endQuizPayload.payload.quiz.theme,
-                  }].concat(state.historyItems)
+                  }].concat(state.historyItems),
+                  badges: newBadgeList,
             };
+            
           }
           case SHOW_QUIZ: {
             const showQuizAction = action as ShowQuizAction;
@@ -126,6 +165,16 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
             return {              
                   ...state, 
                   isOpened:showQuizAction.payload,
+                
+                 
+            };
+          }
+          case SHOW_RESULT_PANEL: {
+            const showResultPanelAction = action as ShowResultPanelAction;
+            console.log('REDUCER - CLOSE_RESULT_PANEL: '); 
+            return {              
+                  ...state, 
+                  showResultPanel:showResultPanelAction.payload,
                 
                  
             };

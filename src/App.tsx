@@ -13,7 +13,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import { ellipse, square, triangle, home } from 'ionicons/icons';
 import Home from './pages/Home';
 import Quizes from './pages/Quizes';
-import Tab3 from './pages/Tab3';
+import Badges from './pages/Badges';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -59,7 +59,7 @@ const App: React.FC = () => {
         <IonRouterOutlet>
           <Route path="/home" component={Home} exact={true} />
           <Route path="/quizes" component={Quizes} exact={true} />
-          <Route path="/tab3" component={Tab3} />
+          <Route path="/badges" component={Badges} />
           <Route path="/" render={() => <Redirect to="/home" />} exact={true} />
         </IonRouterOutlet>
         <IonTabBar slot="bottom" class="foreGroundStyle" >
@@ -70,6 +70,10 @@ const App: React.FC = () => {
           <IonTabButton tab="quizes" href="/quizes" class="tabButtonStyle">
             <IonIcon icon={ellipse} />
             <IonLabel>History</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="badges" href="/badges" class="tabButtonStyle">
+            <IonIcon icon={ellipse} />
+            <IonLabel>Badges</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>

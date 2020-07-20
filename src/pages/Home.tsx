@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonLabel, IonItem, IonSpinner, IonAlert, IonSlides, IonSearchbar, IonList, 
-  Gesture, GestureConfig, createGesture, IonCard, IonCardHeader, IonModal
+  Gesture, GestureConfig, createGesture, IonCard, IonCardHeader, IonModal, IonBackdrop, IonCardContent, IonCardTitle
 } from '@ionic/react';
 import './Home.css';
 //import { useDispatch, useMappedState } from "redux-react-hook";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import  ActionCreators  from "../redux/actions";
-import { locate, closeCircleOutline } from 'ionicons/icons';
+import { locate, closeCircleOutline, flag } from 'ionicons/icons';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
 import { RootState } from '../redux/reducers';
 import Alert from '../components/Alert';
@@ -22,6 +22,10 @@ import { useKeyboardState } from '@ionic/react-hooks/keyboard';
 import { Theme } from '../redux/constants';
 import { ReactNode} from 'react';
 import useWindowSize from '../redux/custom-hooks/windowSize-hook';
+import ResultPanel from '../components/ResultPanel';
+import HistoryItem from '../components/HistoryElement';
+import BadgeElement from '../components/BadgeElement';
+import { Badge } from '../redux/reducers/UquizReducer';
 
 
 const Home: React.FC = () => {
@@ -49,26 +53,28 @@ const Home: React.FC = () => {
     quizLoading: state.quiz.loading,
     quizErrorMessage: state.quiz.errorMessage,
     questions: state.quiz.quiz.questions,
-    currentQuiz: state.quiz.quiz,
     flags: state.quiz.flags,
     selectedFlag: state.quiz.selectedFlag,
     loadingFlags: state.quiz.loadingFlags,
   });
 
   const uQuizState = (state:RootState) => ({
+    historyItem: state.uQuiz.historyItems,
     questionIndex: state.uQuiz.questionIndex,
     uAnswers: state.uQuiz.uAnswers,
     isFinished: state.uQuiz.isFinished,
     totalScore: state.uQuiz.score,
     isQuizOpened: state.uQuiz.isOpened,
+    showResultPanel: state.uQuiz.showResultPanel,
+    badgesItems: state.uQuiz.badges,
   });
 
  
   //global state
   const { target, qwantLoading, articles, proxyActivated, qwantErrorMessage } = useSelector(qwantState);
   const { location, geoErrorMessage, geoLoading } = useSelector(geoState);
-  const { quizLoading, questions, currentQuiz, flags, selectedFlag, loadingFlags } = useSelector(quizState);
-  const { questionIndex, uAnswers, isFinished, totalScore, isQuizOpened } = useSelector(uQuizState);
+  const { quizLoading, questions, flags, selectedFlag, loadingFlags } = useSelector(quizState);
+  const { questionIndex, uAnswers, isFinished, totalScore, isQuizOpened, showResultPanel, historyItem, badgesItems } = useSelector(uQuizState);
  
   //Local state
    const [searchText, setSearchText] = useState('Saint-James');
@@ -80,14 +86,14 @@ const Home: React.FC = () => {
     isSelected:false,}]
    );
    const [isTyping, setIsTyping] = useState(false);
-   const { isOpen, keyboardHeight } = useKeyboardState();
+   
    const [quizTheme, setQuizTheme] = useState(Theme.ALL.toString());
 
    const { width } = useWindowSize();
   //actions dispatcher
   const dispatch = useDispatch(); 
 
-  let hasPageLoaded = false;
+
 
 //first time, set the searchbar with location town from init state
   useEffect(() => {
@@ -147,7 +153,7 @@ const locateUser = () => {
     
 }
   ///Run Questions
-const runQuestions = (location:Location) => {
+const runQuestions = (location:Location, theme:string) => {
   // setIsQuizOpen(true);
    dispatch(ActionCreators.quizActions.clearQuestionsList());
    dispatch(ActionCreators.quizActions.fillQuiz(
@@ -158,7 +164,7 @@ const runQuestions = (location:Location) => {
    dispatch(ActionCreators.userQuizActions.startQuiz());
    dispatch(ActionCreators.quizActions.launchQuiz(
      {
-       theme:quizTheme
+       theme
       }
      ));
     
@@ -175,14 +181,7 @@ const clickYesHandler = (currentQuestion:Question) => {
         isCorrect: currentQuestion.correct? true: false,
       }}
     ));
-  }  
-  // if(questionIndex === questions.length - 1) {
-  //   dispatch(ActionCreators.userQuizActions.endQuiz(
-  //     {
-  //       quiz: currentQuiz
-  //     }
-  //   ));
-  // }
+  }    
 }
 
 const clickNoHandler = (currentQuestion:Question) => {
@@ -195,14 +194,7 @@ const clickNoHandler = (currentQuestion:Question) => {
          isCorrect: currentQuestion.correct? false: true,
        }}
     ));
-  }
-  // if(questionIndex === questions.length - 1) {
-  //   dispatch(ActionCreators.userQuizActions.endQuiz(
-  //     {
-  //       quiz: currentQuiz
-  //     }
-  //   ));
-  // }
+  }  
 }
 
 const hideQuiz = () => {
@@ -212,8 +204,6 @@ const hideQuiz = () => {
 
 ///////Search Box///////
 const SearchBoxValueChangedHandler = (input:string) => {
-  console.log('getSearchBoxValue',input);
-
   setSearchText(input);
 
   if( flags.filter(flag => flag.label.toLowerCase() === input.toLowerCase()).length === 1) {
@@ -254,7 +244,7 @@ const onClearSearchBox = () => {
 }
 
 
-  //////Flags
+//////Flags////////
   const selectFlagHandler = (flag:Flag) => {
     console.log('selectFlag',flag);
     setIsFlagSelected(true);
@@ -263,9 +253,7 @@ const onClearSearchBox = () => {
     console.log('selectFlag3');
     dispatch(ActionCreators.quizActions.selectFlag({
       WdCode: flag.WdCode
-    }));
-   // setIsTyping(false);
-   
+    }));  
   }
   
   const flagSlides = flags.map(flag => {
@@ -290,13 +278,48 @@ const onClearSearchBox = () => {
   console.log('segmentChangeHandler',theme);
   setQuizTheme(theme);
  }
+
+ ////////ResultPanel//////
+ const closeResultPanel = () => {
+   console.log('closeResultpanel');
+   dispatch(ActionCreators.userQuizActions.showResultPanel(false));
+ }
+
+ ////////Badges////////////
+ const selectBadgeHandler = (flag:Flag,badge:Badge, theme:string) => {
+  setSearchText(flag.label);
+  setQuizTheme(theme);
+  dispatch(ActionCreators.geoActions.setLocationFromFlag({flag}));
+  console.log('selectFlagBadge');
+  dispatch(ActionCreators.quizActions.selectFlag({
+    WdCode: flag.WdCode
+  }));
+ // runQuestions(location,theme);
+ }
+
+ const badgesList = (badges:Badge[]) => {
+  const themesList = Object.values(Theme);
+ 
+    return (<div>
+      {
+      themesList.map(theme => {
+       // return stylingBadges(badges,flag, cat);
+       return <BadgeElement 
+        key= {selectedFlag.WdCode + theme}
+        flag = {selectedFlag}
+        badges = {badges}
+        theme = {theme}
+        selectBadge = {selectBadgeHandler}
+       />
+      })
+      }
+    </div>)
+  }
   
 /////////////// Question Slides JSX //////
 
 const questionsCount =  'questions:' + (questionIndex + 1) + '/' + questions.length;
 const currentScore = 'Score: ' + uAnswers.filter(answer => answer.isCorrect === true).length + '/' + questionIndex;
-const resultScore = <h2>Finished with {totalScore}%</h2>;
-
 const loadingQuestionsSpinner = (<div><IonSpinner name='lines'/> <p>Loading Questions</p></div>)
 
 const questionsSlides = 
@@ -327,16 +350,12 @@ const questionsSlides =
     }
     </IonCol>
     </IonRow></IonGrid>);
-
-
-
   return (
     <IonPage>
       <IonAlert
           isOpen={geoErrorMessage !== "" ? true : false}
           onDidDismiss={() => {
-            dispatch(ActionCreators.geoActions.clearGeoErrorMessage());
-            
+            dispatch(ActionCreators.geoActions.clearGeoErrorMessage());            
           }}
           header={'Error'}
           subHeader={geoErrorMessage}
@@ -348,25 +367,20 @@ const questionsSlides =
           <IonTitle>TinQuiz</IonTitle>
         </IonToolbar>
       </IonHeader>
+
       <IonContent id='homePage'>
+      { showResultPanel&&
+        <ResultPanel
+          key={Date.now().toString()}
+          historyItem={historyItem[0]}
+          showResultPanel={showResultPanel}
+          flag={selectedFlag}
+          message={''+totalScore}
+          closeResultPanel={closeResultPanel}
+        />
+      }
         <IonGrid>
-
-{
-  // <IonModal 
-  // id='MyModal'
-  // isOpen={!isFinished && isQuizOpened }
-  // onDidDismiss={() => hideQuiz()}
-  // swipeToClose={true}
-  // >
-  //   <IonButton onClick={() => hideQuiz()}>Close Modal</IonButton>
-  //   {questionsSlides}
-    
-  //   </IonModal>
-
-}
 {!isFinished && isQuizOpened && questionsSlides }
-
- 
             <IonRow>
            <IonCol offset="0" size="12">
            {
@@ -399,20 +413,16 @@ const questionsSlides =
                    
     <IonItem 
       lines='none'
-      class='backGroundStyle'
-      >
-               
-                <IonSearchbar
-               
-                type="text" 
-                debounce={500} 
-                ref={boxRef}
-                value={searchText} 
-                 onIonClear = {() => onClearSearchBox()}
-                onIonChange={e => SearchBoxValueChangedHandler(e.detail.value!)}
+      class='backGroundStyle'>               
+                <IonSearchbar               
+                  type="text" 
+                  debounce={500} 
+                  ref={boxRef}
+                  value={searchText} 
+                  onIonClear = {() => onClearSearchBox()}
+                  onIonChange={e => SearchBoxValueChangedHandler(e.detail.value!)}
                 ></IonSearchbar>
             </IonItem>
-
             {isTyping && suggestionCountryList.length>0 && 
                 <IonList lines='none'  
                   class='backGroundStyle'>
@@ -424,8 +434,6 @@ const questionsSlides =
 
                   />)}
                  </IonList>}
- 
-              
             </IonCol>
             <IonCol >
             <IonButton onClick={locateUser}>
@@ -440,14 +448,12 @@ const questionsSlides =
                   <IonButton 
                   size='large'
                     expand="full"
-                    onClick={()=>runQuestions(location)}>
+                    onClick={()=>runQuestions(location, quizTheme)}>
                   <IonLabel>Launch Quiz</IonLabel>
                 </IonButton>
               </IonCol>
           </IonRow>
           }
-          
-
           <IonRow className="ion-margin-top">
             <IonCol 
               class='ion-text-center'
@@ -457,14 +463,25 @@ const questionsSlides =
             }
              {
             quizLoading && loadingQuestionsSpinner
-            }
-          
+            }          
             </IonCol>
             </IonRow>
             <IonRow >
-              <IonCol offset="0" size="12">          
+              <IonCol offset="0" size="12">
               {
-                 isFinished && isQuizOpened && resultScore
+                !isQuizOpened && selectedFlag &&   <IonCard id="badge-card">
+                    <IonCardHeader>
+                      <IonCardTitle color="primary">
+                      Unlock Badges
+                      </IonCardTitle>
+                    
+                      </IonCardHeader> 
+                      <IonCardContent>      
+                {
+                    badgesList(badgesItems)
+                }
+                </IonCardContent>
+                </IonCard>
                }
               </IonCol>
             </IonRow>

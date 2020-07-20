@@ -3,8 +3,8 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonSlides, IonSli
 import './Quizes.css';
 import { RootState } from '../redux/reducers';
 import { useSelector, useDispatch } from 'react-redux';
-import HistoryItem from '../components/HistoryItem';
-import { historyItem } from '../redux/reducers/UquizReducer';
+import HistoryElement from '../components/HistoryElement';
+import { HistoryItem } from '../redux/reducers/UquizReducer';
 import FlagSlide from '../components/FlagSlide';
 import { Flag } from '../redux/reducers/QuizReducer';
 import  ActionCreators  from "../redux/actions";
@@ -19,8 +19,8 @@ const Quizes: React.FC = () => {
   const { historyItems } = useSelector(uQuizState);
 
   const historyContent =   
-  historyItems.map((item: historyItem) => {   
-    return (<HistoryItem 
+  historyItems.map((item: HistoryItem) => {   
+    return (<HistoryElement 
       key = {item.id} 
       historyItem = {item}
     />)

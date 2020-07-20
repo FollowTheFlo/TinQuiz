@@ -32,6 +32,7 @@ export const EMPTY_ACTION = 'EMPTY_ACTION';
 export const START_QUIZ = 'START_QUIZ';
 export const END_QUIZ = 'END_QUIZ';
 export const SHOW_QUIZ = 'SHOW_QUIZ';
+export const SHOW_RESULT_PANEL = 'SHOW_RESULT_PANEL';
 ////////////Quiz Queries///////
 
 export const musicianByCountry = 'musicianByCountry';

@@ -1,0 +1,25 @@
+.badgeMedal {
+
+}
+
+.trophee {
+   
+    top: 0%;
+    left:5%;
+    font-size: 20px;
+    width: 100%;
+    font-weight: bold;
+    color: black;
+    opacity: 0.5;
+  }
+
+  #medal {
+    text-align: center;
+  }
+
+  .badgeImg {
+    opacity: 0.5;
+    height:40px;
+    width:40px;
+    border-radius: 50% !important;
+  }

@@ -1,11 +1,11 @@
 import React from 'react';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonImg } from '@ionic/react';
-import { QwantArticle } from './../redux/store';
+import { QwantArticle } from '../redux/store';
 import { Question } from '../redux/reducers/QuizReducer';
-import { historyItem } from '../redux/reducers/UquizReducer';
+import { HistoryItem } from '../redux/reducers/UquizReducer';
 
 
-const HistoryItem: React.FC<{ historyItem: historyItem, key:string}> = props => {
+const HistoryElement: React.FC<{ historyItem: HistoryItem, key:string}> = props => {
   return (
     <IonCard 
     >
@@ -17,4 +17,4 @@ const HistoryItem: React.FC<{ historyItem: historyItem, key:string}> = props => 
   );
 };
 
-export default HistoryItem;
+export default HistoryElement;
