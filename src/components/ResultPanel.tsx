@@ -28,13 +28,13 @@ props.historyItem.theme===Theme.ENTERPRISES ? <IonIcon icon={business}></IonIcon
 function badgeMessage(){
     console.log('badgeMessage');
     if(props.historyItem) {
-        if(props.historyItem.score >= 80 && props.historyItem.score <90) {
+        if(props.historyItem.score >= 60 && props.historyItem.score <80) {
            
-            return `Congrat! 80% to 89% you unlocked a Bronze Badge on ${props.historyItem.country} - ${props.historyItem.theme}`
+            return `Congrat! 60% to 79% you unlocked a Bronze Badge on ${props.historyItem.country} - ${props.historyItem.theme}`
         }
-        if(props.historyItem.score >= 90 && props.historyItem.score <100) {
+        if(props.historyItem.score >= 80 && props.historyItem.score <100) {
            
-            return `Congrat! 90% to 99% you unlocked a Silver Badge on ${props.historyItem.country} - ${props.historyItem.theme}`
+            return `Congrat! 80% to 99% you unlocked a Silver Badge on ${props.historyItem.country} - ${props.historyItem.theme}`
         }
         if(props.historyItem.score === 100) {
            
@@ -49,7 +49,7 @@ function badgeMessage(){
     isOpen={props.showResultPanel} 
     swipeToClose={true}
     backdropDismiss={true}
-    onDidDismiss={()=>props.closeResultPanel()}
+    onWillDismiss={()=>props.closeResultPanel()}
     >
     <IonCard
       onClick={()=>props.closeResultPanel()}
@@ -61,13 +61,13 @@ function badgeMessage(){
       <IonCardContent>
           <div id="medal">
             <h2>{badgeMessage()}</h2>
-            { props.historyItem.score >= 80 &&
+            { props.historyItem.score >= 60 &&
              <div>
                 <img src={props.flag.image}  id="badgeImg" alt="badge"></img>
-                <div id="test"
+                <div id="resultIcon"
                     style={{color:props.historyItem.score === 100?'gold':
-                    props.historyItem.score >= 90?'silver':
-                    props.historyItem.score >= 80?'darkorange':'black'
+                    props.historyItem.score >= 80?'silver':
+                    props.historyItem.score >= 60?'darkorange':'black'
 
                         }}
                 > 

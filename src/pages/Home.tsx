@@ -123,7 +123,7 @@ const Home: React.FC = () => {
 
    useEffect(() => {
     dispatch(ActionCreators.quizActions.runFlags());
-    
+    dispatch(ActionCreators.userQuizActions.startApp());
    },[])
   
    useEffect(() => {   
@@ -294,7 +294,7 @@ const onClearSearchBox = () => {
   dispatch(ActionCreators.quizActions.selectFlag({
     WdCode: flag.WdCode
   }));
- // runQuestions(location,theme);
+  runQuestions(location,theme);
  }
 
  const badgesList = (badges:Badge[]) => {
@@ -318,27 +318,35 @@ const onClearSearchBox = () => {
   
 /////////////// Question Slides JSX //////
 
-const questionsCount =  'questions:' + (questionIndex + 1) + '/' + questions.length;
-const currentScore = 'Score: ' + uAnswers.filter(answer => answer.isCorrect === true).length + '/' + questionIndex;
+const questionsCount =  'Questions ' + (questionIndex + 1) + ' / ' + questions.length;
+const currentScore = 'Score: ' + uAnswers.filter(answer => answer.isCorrect === true).length + ' / ' + questionIndex;
 const loadingQuestionsSpinner = (<div><IonSpinner name='lines'/> <p>Loading Questions</p></div>)
 
 const questionsSlides = 
-    (<IonGrid><IonRow >
-    <IonCol size="10">          
+    (<IonGrid>
+     <IonRow>
+     <IonCol size="10" className="mainTitle">
+       {selectedFlag.label} - {quizTheme}
+       </IonCol>
+      <IonCol size="2">
+        <IonButton onClick={hideQuiz}>
+            <IonIcon icon={closeCircleOutline}></IonIcon>
+        </IonButton>
+       </IonCol>
+       </IonRow> 
+       <IonRow>
+    <IonCol size="12" className="centerText">          
     {
       questions.length > 0  && currentScore
     }
     
     </IonCol>
-    <IonCol>
-    <IonButton onClick={hideQuiz}>
-            <IonIcon icon={closeCircleOutline}></IonIcon>
-            </IonButton>
-    </IonCol>
+
+    
     </IonRow>
     <IonRow >
 
-    <IonCol offset="0" size="12">
+    <IonCol offset="0" size="12"  className="centerText">
     { questions.length > 0 && questionsCount }
     {
         questions.length > 0 && questions[questionIndex] && <QuestionItem
@@ -407,7 +415,7 @@ const questionsSlides =
               }
            </IonRow>
           
- { !isQuizOpened &&  <IonRow className="ion-margin-top">
+ { !isQuizOpened &&  <IonRow class='ion-text-center'>
             <IonCol size="9">
           
                    
@@ -436,14 +444,14 @@ const questionsSlides =
                  </IonList>}
             </IonCol>
             <IonCol >
-            <IonButton onClick={locateUser}>
-            <IonIcon icon={locate}></IonIcon>
-            </IonButton>
+              <IonButton onClick={locateUser}>
+                <IonIcon icon={locate}></IonIcon>
+              </IonButton>
             </IonCol>
           </IonRow>
           }
           { !isQuizOpened &&
-          <IonRow className="ion-margin-top">
+          <IonRow >
             <IonCol offset="2" size="8">
                   <IonButton 
                   size='large'
@@ -454,7 +462,7 @@ const questionsSlides =
               </IonCol>
           </IonRow>
           }
-          <IonRow className="ion-margin-top">
+          <IonRow >
             <IonCol 
               class='ion-text-center'
               offset="2" size="8">
@@ -471,7 +479,7 @@ const questionsSlides =
               {
                 !isQuizOpened && selectedFlag &&   <IonCard id="badge-card">
                     <IonCardHeader>
-                      <IonCardTitle color="primary">
+                      <IonCardTitle>
                       Unlock Badges
                       </IonCardTitle>
                     

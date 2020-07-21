@@ -1,7 +1,7 @@
 import { Choice } from './ChoiceReducer';
 import { Action } from '../actions/quizActions';
-import { GoNextQuestionAction, StartQuizPayload, StartQuizAction, EndQuizAction, ShowQuizAction, ShowResultPanelAction } from '../actions/userQuizActions';
-import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ, EMPTY_ACTION, SHOW_RESULT_PANEL } from '../constants';
+import { GoNextQuestionAction, StartQuizPayload, StartQuizAction, EndQuizAction, ShowQuizAction, ShowResultPanelAction, FillbadgesAction } from '../actions/userQuizActions';
+import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ, EMPTY_ACTION, SHOW_RESULT_PANEL, FILL_BADGES } from '../constants';
 import { Question, Quiz } from './QuizReducer';
 
 export interface Uanswer {
@@ -117,7 +117,7 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
             const totalScore = (Math.trunc (10000 * (correctAnswersCount / totalAnswers )))/100;
             let newBadgeList:Badge[] = [...state.badges];
            
-            if(totalScore >= 80 )
+            if(totalScore >= 60 )
             {
                 const badge:Badge = {
                   id: Date.now().toString(),
@@ -131,7 +131,7 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
               
                 if(totalScore === 100) {
                   badge.award= 'Gold';
-                } else if(totalScore >= 90) {
+                } else if(totalScore >= 80) {
                   badge.award= 'Silver';
                 }
                 newBadgeList = [...state.badges].concat(badge);
@@ -139,7 +139,7 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
 
             return {              
                   ...state,
-                  showResultPanel:true,
+                  //showResultPanel:true,
                   isFinished:true,
                   isOpened:false,
                   quiz: endQuizPayload.payload.quiz,
@@ -175,6 +175,16 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
             return {              
                   ...state, 
                   showResultPanel:showResultPanelAction.payload,
+                
+                 
+            };
+          }
+          case FILL_BADGES: {
+            const fillbadgesAction = action as FillbadgesAction;
+            console.log('REDUCER - FILL_BADGES: ',fillbadgesAction.payload); 
+            return {              
+                  ...state, 
+                  badges:fillbadgesAction.payload.badges,
                 
                  
             };

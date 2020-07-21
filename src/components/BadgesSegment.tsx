@@ -14,10 +14,10 @@ const BadgesSegments: React.FC<{
     value= {props.selectedScope}
     onIonChange={e => props.onSegmentValueChange(e.detail.value)}>
     <IonSegmentButton value={'ALL'} >
-      <IonLabel>All</IonLabel>
+      <IonLabel>All Badges</IonLabel>
     </IonSegmentButton>
     <IonSegmentButton value={'USER'}>
-      <IonLabel>User Badges</IonLabel>
+      <IonLabel>My Badges</IonLabel>
     </IonSegmentButton>
    </IonSegment>          
   );

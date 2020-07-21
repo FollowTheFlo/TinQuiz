@@ -2,7 +2,7 @@ import {qwantEpic} from './qwantEpics';
 import {locationEpic} from './geoEpics';
 import {quizEpic,questionEpic, runQuestionListEpic, FillQuizEpic, RunFlagsEpic, launchQuizEpic, fillDistractorEpic} from './quizEpics';
 import { combineEpics } from 'redux-observable';
-import { goNextQuestionEpic } from './userQuizEpics';
+import { goNextQuestionEpic, endQuizEpic, startAppEpic } from './userQuizEpics';
 
   const AllEpics = combineEpics(
     qwantEpic,
@@ -15,6 +15,8 @@ import { goNextQuestionEpic } from './userQuizEpics';
     launchQuizEpic,
     fillDistractorEpic,
     goNextQuestionEpic,
+    endQuizEpic,
+    startAppEpic,
     
   );
 

@@ -1,5 +1,5 @@
-import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ, EMPTY_ACTION, SHOW_RESULT_PANEL } from "../constants";
-import { Uanswer} from '../reducers/UquizReducer';
+import { GO_NEXT_QUESTION, START_QUIZ, END_QUIZ, SHOW_QUIZ, EMPTY_ACTION, SHOW_RESULT_PANEL, FILL_BADGES, START_APP } from "../constants";
+import { Uanswer, Badge} from '../reducers/UquizReducer';
 import { Quiz } from "../reducers/QuizReducer";
 
   //---------Generic Action
@@ -43,6 +43,15 @@ import { Quiz } from "../reducers/QuizReducer";
 }
 
 
+///////// Fill Badges ///////
+export interface FillbadgesAction extends Action {
+  payload: FillbadgesPayload;
+}
+export interface FillbadgesPayload{
+  badges: Badge[];
+}
+
+
 const ActionCreators = {
   goNextQuestion: (payload: GoNextQuestionPayload) => ({ type: GO_NEXT_QUESTION, payload: payload}),
   emptyAction: () => ({ type: EMPTY_ACTION }),
@@ -50,6 +59,8 @@ const ActionCreators = {
   endQuiz: (payload: EndQuizPayload) => ({ type: END_QUIZ, payload: payload}),
   showQuiz: (payload: boolean) => ({ type: SHOW_QUIZ, payload: payload}),
   showResultPanel: (payload: boolean) => ({ type: SHOW_RESULT_PANEL, payload: payload}),
-  }
+  fillbadges: (payload:FillbadgesPayload) => ({ type: FILL_BADGES, payload: payload}),
+  startApp: () => ({ type: START_APP }),
+}
 
   export default ActionCreators;

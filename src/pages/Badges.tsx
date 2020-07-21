@@ -25,7 +25,7 @@ const categories = Object.values(Theme);
   const { badgesItems, flags } = useSelector(uQuizState);
   const dispatch = useDispatch(); 
 
-  const [scope, setScope] = useState('ALL');
+  const [scope, setScope] = useState('USER');
 
   useEffect(() => {
     console.log('Badges UseEffect');
