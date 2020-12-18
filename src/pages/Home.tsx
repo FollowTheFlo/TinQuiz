@@ -372,7 +372,7 @@ const questionsSlides =
         />
       <IonHeader>
         <IonToolbar id='homeToolbar'>
-          <IonTitle>TinQuiz</IonTitle>
+          <div className='mainTitle'>TinQuiz</div>
         </IonToolbar>
       </IonHeader>
 
@@ -416,13 +416,14 @@ const questionsSlides =
            </IonRow>
           
  { !isQuizOpened &&  <IonRow class='ion-text-center'>
-            <IonCol size="9">
+            <IonCol offset="0" size="9">
           
                    
     <IonItem 
       lines='none'
       class='backGroundStyle'>               
-                <IonSearchbar               
+                <IonSearchbar
+                id="searchBar"               
                   type="text" 
                   debounce={500} 
                   ref={boxRef}
@@ -452,7 +453,7 @@ const questionsSlides =
           }
           { !isQuizOpened &&
           <IonRow >
-            <IonCol offset="2" size="8">
+            <IonCol offset="0" size="12">
                   <IonButton 
                   size='large'
                     expand="full"

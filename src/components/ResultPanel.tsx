@@ -41,7 +41,7 @@ function badgeMessage(){
             return `Congrat! 100% you unlocked the Golden Badge on ${props.historyItem.country} - ${props.historyItem.theme}`
         }
     }
-    return 'Try again! You need over 80% to win a Badge'
+    return 'Try again! You need over 60% to win a Badge'
 }
   return (
     <IonModal

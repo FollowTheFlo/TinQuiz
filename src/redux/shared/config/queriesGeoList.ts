@@ -1,4 +1,14 @@
 export const questionGeoList = [
+  {
+    topic: 'location',
+    type: 'place',
+    isDistractor: true,
+  }, 
+  {
+    topic: 'location',
+    type: 'place',
+    isDistractor: false,
+  }, 
     {
       topic: 'townByCountry',
       type: 'country',

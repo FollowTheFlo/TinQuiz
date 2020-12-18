@@ -10,7 +10,7 @@ import {
   IonTabs
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { ellipse, square, triangle, home } from 'ionicons/icons';
+import { ellipse, square, triangle, home, time, ribbon } from 'ionicons/icons';
 import Home from './pages/Home';
 import Quizes from './pages/Quizes';
 import Badges from './pages/Badges';
@@ -68,11 +68,11 @@ const App: React.FC = () => {
             <IonLabel>Home</IonLabel>
           </IonTabButton>
           <IonTabButton tab="quizes" href="/quizes" class="tabButtonStyle">
-            <IonIcon icon={ellipse} />
+            <IonIcon icon={time} />
             <IonLabel>History</IonLabel>
           </IonTabButton>
           <IonTabButton tab="badges" href="/badges" class="tabButtonStyle">
-            <IonIcon icon={ellipse} />
+            <IonIcon icon={ribbon} />
             <IonLabel>Badges</IonLabel>
           </IonTabButton>
         </IonTabBar>

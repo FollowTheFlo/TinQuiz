@@ -36,34 +36,34 @@ const categories = Object.values(Theme);
   const badgesList = (badges:Badge[], filter:string) => {
   
   return flags
-  .filter(flag => {
-    if(filter=== 'USER') {
-      return badges.findIndex(b => b.countryWD === flag.WdCode ) != -1;
-    }
-    return true;
-  })
-  .map(flag => {
-    return (<IonCol>
-      {
-      categories
-      .filter(cat => {
-        if(filter=== 'USER') {
-          return badges.findIndex(b => b.theme === cat && b.countryWD === flag.WdCode ) != -1;
-        }
-        return true;
-      })
-      .map(cat => {
-       // return stylingBadges(badges,flag, cat);
-       return <BadgeElement 
-        key= {flag.WdCode + cat + flag.label}
-        flag = {flag}
-        badges = {badges}
-        theme = {cat}
-        selectBadge = {() => {}}
-       />
-      })
+    .filter(flag => {
+      if(filter=== 'USER') {
+        return badges.findIndex(b => b.countryWD === flag.WdCode ) != -1;
       }
-    </IonCol>)
+      return true;
+    })
+    .map(flag => {
+      return (<IonCol>
+        {
+        categories
+        .filter(cat => {
+          if(filter=== 'USER') {
+            return badges.findIndex(b => b.theme === cat && b.countryWD === flag.WdCode ) != -1;
+          }
+          return true;
+        })
+        .map(cat => {
+        // return stylingBadges(badges,flag, cat);
+        return <BadgeElement 
+          key= {flag.WdCode + cat + flag.label}
+          flag = {flag}
+          badges = {badges}
+          theme = {cat}
+          selectBadge = {() => {}}
+        />
+        })
+        }
+      </IonCol>)
   })}
 
   const segmentChangeHandler = (scope:string) => {

@@ -1,12 +1,29 @@
   #homePage {
-    --background: #c7b2ad;
+    --background: rgb(220, 220, 220);
+    
   }
 
   #homeToolbar {
     --background: var(--ion-color-primary);
     --color:white;
     text-align: center;
+   
+    box-shadow: 0px 5px 5px #888888;
+   
+    padding-bottom:0px;
+    padding-top:0px;
+    height:30px;
+       
   }
+
+  .mainTitle {
+    font-size: 22px;
+    font-weight: bold;
+    padding-bottom:25px;
+    padding-top:0px;
+   
+  }
+  
 
   .foreGroundStyle {
     --background: var(--ion-color-primary);
@@ -17,7 +34,7 @@
     --background: green;
   }
   .backGroundStyle {
-    --background: #c7b2ad;
+    --background: rgb(220, 220, 220);
   }
 
   .trueButton {
@@ -32,6 +49,11 @@
 
   #flagsSlide {
     margin-top: 0%;
+  }
+
+  #searchBar {
+    margin-left:0px;
+    padding-left:0px;
   }
 
   #questionHeader {
@@ -83,11 +105,6 @@
     color: var(--ion-color-primary);
   }
 
-  .mainTitle {
-    text-align: center;
-    font-size: 30px;
-    font-weight: bold;
-  }
 
   #resultIcon {
     position: absolute;
@@ -97,4 +114,11 @@
     width: 100%;
     font-weight: bold;
     color: darkorange;
+  }
+
+  @media (min-width : 500px){
+    body {
+      margin-left:20%;
+      margin-right:20%;
+    }
   }

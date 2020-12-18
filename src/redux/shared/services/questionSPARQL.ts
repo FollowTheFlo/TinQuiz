@@ -125,7 +125,7 @@ WHERE{
 OPTIONAL {?actor wdt:P1411 ?nomination}
 SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en".}
 }
-GROUP BY ?actor ?actorLabel ?image ?nomination
+GROUP BY ?actor ?actorLabel ?image ?nomination 
 HAVING (COUNT(distinct ?country) < 2)
 ORDER BY (?nomination)
 LIMIT 50 &format=json`;}

@@ -117,6 +117,18 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
             const totalScore = (Math.trunc (10000 * (correctAnswersCount / totalAnswers )))/100;
             let newBadgeList:Badge[] = [...state.badges];
            
+            console.log('BADGE LIST 1',newBadgeList);
+
+            //check if we have 
+            newBadgeList = newBadgeList.filter(badge => 
+              badge.countryWD !== endQuizPayload.payload.quiz.location.countryWD 
+              || badge.score >  totalScore
+              || badge.theme !== endQuizPayload.payload.quiz.theme
+              )
+             
+         
+            console.log('BADGE LIST 2',newBadgeList);
+
             if(totalScore >= 60 )
             {
                 const badge:Badge = {
@@ -134,7 +146,7 @@ export const uQuizReducer =  (state:UquizState = initialState, action: Action): 
                 } else if(totalScore >= 80) {
                   badge.award= 'Silver';
                 }
-                newBadgeList = [...state.badges].concat(badge);
+                newBadgeList = newBadgeList.concat(badge);
             }
 
             return {              
