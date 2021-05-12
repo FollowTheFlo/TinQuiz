@@ -34,15 +34,6 @@ const Home: React.FC = () => {
   const boxRef = useRef<HTMLIonSearchbarElement>(null);
   
 
-   
-  const qwantState = (state: RootState) => ({
-    qwantLoading: state.qwant.qwantLoad,
-    articles: state.qwant.qwantArticles,
-    target: state.qwant.target,
-    proxyActivated: state.qwant.proxyActivated,
-    qwantErrorMessage:  state.qwant.errorMessage
-
-  });
   const geoState = (state: RootState) => ({
     location: state.geo.location,
     geoErrorMessage: state.geo.errorMessage,
@@ -71,7 +62,6 @@ const Home: React.FC = () => {
 
  
   //global state
-  const { target, qwantLoading, articles, proxyActivated, qwantErrorMessage } = useSelector(qwantState);
   const { location, geoErrorMessage, geoLoading } = useSelector(geoState);
   const { quizLoading, questions, flags, selectedFlag, loadingFlags } = useSelector(quizState);
   const { questionIndex, uAnswers, isFinished, totalScore, isQuizOpened, showResultPanel, historyItem, badgesItems } = useSelector(uQuizState);
@@ -323,7 +313,7 @@ const currentScore = 'Score: ' + uAnswers.filter(answer => answer.isCorrect === 
 const loadingQuestionsSpinner = (<div><IonSpinner name='lines'/> <p>Loading Questions</p></div>)
 
 const questionsSlides = 
-    (<IonGrid>
+    (<IonGrid id="questionsSlides">
      <IonRow>
      <IonCol size="10" className="mainTitle">
        {selectedFlag.label} - {quizTheme}
@@ -335,29 +325,29 @@ const questionsSlides =
        </IonCol>
        </IonRow> 
        <IonRow>
-    <IonCol size="12" className="centerText">          
-    {
-      questions.length > 0  && currentScore
-    }
-    
-    </IonCol>
-
-    
+        <IonCol size="12" className="centerText">          
+        {
+          questions.length > 0  && currentScore
+        }    
+        </IonCol>    
     </IonRow>
     <IonRow >
 
-    <IonCol offset="0" size="12"  className="centerText">
-    { questions.length > 0 && questionsCount }
-    {
-        questions.length > 0 && questions[questionIndex] && <QuestionItem
-            key = {questions[questionIndex].id} 
-            question = {questions[questionIndex]}           
-            clickYes = {clickYesHandler}
-            clickNo = {clickNoHandler}
-              /> 
-    }
-    </IonCol>
-    </IonRow></IonGrid>);
+      <IonCol offset="0" size="12"  className="centerText">
+      { questions.length > 0 && questionsCount }
+      {
+          questions.length > 0 && questions[questionIndex] && <QuestionItem
+              key = {questions[questionIndex].id} 
+              question = {questions[questionIndex]}           
+              clickYes = {clickYesHandler}
+              clickNo = {clickNoHandler}
+                /> 
+      }
+      </IonCol>
+    </IonRow>
+  </IonGrid>);
+
+
   return (
     <IonPage>
       <IonAlert
@@ -370,7 +360,7 @@ const questionsSlides =
           message={geoErrorMessage}
           buttons={['OK']}
         />
-      <IonHeader>
+      <IonHeader id="tinHeader">
         <IonToolbar id='homeToolbar'>
           <div className='mainTitle'>TinQuiz</div>
         </IonToolbar>
@@ -403,7 +393,7 @@ const questionsSlides =
 
            </IonCol> 
            </IonRow>
-           <IonRow>
+           <IonRow  class='ion-text-center'>
              
              {
               !isQuizOpened && <ThemeSegments
@@ -444,8 +434,8 @@ const questionsSlides =
                   />)}
                  </IonList>}
             </IonCol>
-            <IonCol >
-              <IonButton onClick={locateUser}>
+            <IonCol id="locationCol">
+              <IonButton id="locationButton" onClick={locateUser}>
                 <IonIcon icon={locate}></IonIcon>
               </IonButton>
             </IonCol>
@@ -455,6 +445,7 @@ const questionsSlides =
           <IonRow >
             <IonCol offset="0" size="12">
                   <IonButton 
+                  id="launchButton"
                   size='large'
                     expand="full"
                     onClick={()=>runQuestions(location, quizTheme)}>

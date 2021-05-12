@@ -52,9 +52,9 @@ const App: React.FC = () => {
 
   return (
     <Provider store={store}>
-  <IonApp>
+  <IonApp id="ionApp">
     <IonReactRouter>
-      <div id="mainTabs">
+     
       <IonTabs>
         <IonRouterOutlet>
           <Route path="/home" component={Home} exact={true} />
@@ -62,7 +62,7 @@ const App: React.FC = () => {
           <Route path="/badges" component={Badges} />
           <Route path="/" render={() => <Redirect to="/home" />} exact={true} />
         </IonRouterOutlet>
-        <IonTabBar slot="bottom" class="foreGroundStyle" >
+        <IonTabBar slot="top" class="foreGroundStyle" id="topBar">
           <IonTabButton tab="home" href="/home" class="tabButtonStyle">
             <IonIcon icon={home} />
             <IonLabel>Home</IonLabel>
@@ -76,8 +76,24 @@ const App: React.FC = () => {
             <IonLabel>Badges</IonLabel>
           </IonTabButton>
         </IonTabBar>
+        <IonTabBar slot="bottom" class="foreGroundStyle" id="bottomBar">
+          <IonTabButton tab="home" href="/home" class="tabButtonStyle">
+            <IonIcon icon={home} />
+            <IonLabel>Home</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="quizes" href="/quizes" class="tabButtonStyle">
+            <IonIcon icon={time} />
+            <IonLabel>History</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="badges" href="/badges" class="tabButtonStyle">
+            <IonIcon icon={ribbon} />
+            <IonLabel>Badges</IonLabel>
+          </IonTabButton>
+        </IonTabBar>
+        
+        
       </IonTabs>
-      </div>
+     
     </IonReactRouter>
   </IonApp>
   </Provider>

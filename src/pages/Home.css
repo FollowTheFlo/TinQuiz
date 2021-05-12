@@ -1,6 +1,6 @@
   #homePage {
     --background: rgb(220, 220, 220);
-    
+  
   }
 
   #homeToolbar {
@@ -13,7 +13,6 @@
     padding-bottom:0px;
     padding-top:0px;
     height:30px;
-       
   }
 
   .mainTitle {
@@ -47,8 +46,12 @@
     margin-right: 10%;
   }
 
-  #flagsSlide {
+  #flagsSlide n{
     margin-top: 0%;
+  }
+
+  #flagsSegment ion-segment-button {
+text-transform: none;
   }
 
   #searchBar {
@@ -65,10 +68,6 @@
     --color-selected:yellow;
   }
 
-  #mainTabs {
-    background-color: green;
-    --background:green;
-  }
 
   #resultPanel {
     --height:60%;
@@ -116,9 +115,61 @@
     color: darkorange;
   }
 
-  @media (min-width : 500px){
-    body {
-      margin-left:20%;
-      margin-right:20%;
+  #launchButton {
+    margin-left: 15%;
+    margin-right: 15%;
+    text-transform: none;
+  }
+  #locationButton {
+    vertical-align: middle;
+    padding-top:10px;
+    padding-bottom: 0px;
+  }
+
+
+
+
+
+  @media (min-width : 700px){
+    #homePage {
+      --background: rgb(220, 220, 220);
+      --padding-start:15%;
+      --padding-end:15%;
     }
+
+    #questionsSlides,#launchButton, #bottomBar {
+      margin-left: 15%;
+      margin-right: 15%;
+    }
+  }
+
+
+
+  @media (min-width : 900px){
+    #homePage {
+      --background: rgb(220, 220, 220);
+      --padding-start:20%;
+      --padding-end:20%;
+    }
+    #questionsSlides,#launchButton, #bottomBar {
+      margin-left: 20%;
+      margin-right: 20%;
+    }
+
+
+
+  }
+
+  @media (min-width : 1375px){
+    #homePage {
+      --background: rgb(220, 220, 220);
+      --padding-start:25%;
+      --padding-end:25%;
+    }
+    #questionsSlides,#launchButton, #bottomBar {
+      margin-left: 25%;
+      margin-right: 25%;     
+    }
+
+
   }

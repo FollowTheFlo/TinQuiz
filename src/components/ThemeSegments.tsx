@@ -10,6 +10,7 @@ const ThemeSegments: React.FC<{
 
   return (
     <IonSegment 
+    id="flagsSegment"
     scrollable = {true}
     value= {props.selectedTheme}
     onIonChange={e => props.onSegmentValueChange(e.detail.value)}>
