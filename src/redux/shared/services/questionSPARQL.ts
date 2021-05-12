@@ -274,8 +274,11 @@ const personByRegionQuery = (code:string)  => `https://dbpedia.org/sparql?query=
     
   };
 
+  // return single Choice on one of above topic list and specific country (codeWD - stands for WikiData)
 const getSparqlChoice = (topic:string, codeWD: string) => {
 
+  // if the target topic has already been queried before, it is present in choicesMatrix, return random value
+  // don't need to query web again
   const targetChoicesMatrix = choicesMatrix.filter(choice => choice.topic === topic && choice.codeWD === codeWD);
   if(targetChoicesMatrix.length > 0) {
     console.log('IN targetChoicesMatrix',targetChoicesMatrix);
@@ -289,6 +292,10 @@ const getSparqlChoice = (topic:string, codeWD: string) => {
     )
     
   }
+
+ // request specific sparql based on topic and country (=codeWD)
+ // fill choicesMatrix with all choices received.
+ // request return only one choice
  // @ts-ignore
  //bug with hastag char, it needs to be modified after encoding the URL
   const request$ = ajax(encodeURI(queriesMap[topic](codeWD)).replace(/%2523/g,'%23'))
@@ -302,12 +309,15 @@ const getSparqlChoice = (topic:string, codeWD: string) => {
         if(results.length === 0) {
           return {label:'', image:''};
         } 
+      // format the response in Article format
       const fullList: Article[] = results.map( (el:any) => { 
           return { 
              label: el.label.value,
              image: el.image.value,
              }
          })
+        // add this topic list of Choices received in global choices list (choicesMatrix)
+        // choicesMatrix is caching Choices along to avoid querying web with same topics
          choicesMatrix = choicesMatrix.concat(results.map( (el:any) => { 
           return { 
              label: el.label.value,

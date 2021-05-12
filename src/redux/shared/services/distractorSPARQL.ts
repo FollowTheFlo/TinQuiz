@@ -8,6 +8,8 @@ interface WDResponse {
     label: string;
     code: string;
 }
+// distarctor countries are countries from same continent with population over 10millions
+// if country too small laeads to too few values on topics, leads to blank questions
 
 const getSparqlCountryList = (countryWD: string) => {
 
@@ -68,6 +70,7 @@ ORDER BY DESC(?population)
     return request$;
   }
 
+  // distractor on regions, from same country
   const getSparqlRegionList = (regionWD: string) => {
 
     const proxyurl = "https://quiz-magnet.herokuapp.com/";
@@ -129,7 +132,7 @@ ORDER BY DESC(?population)
     return request$;
   }
   
-
+// distractor on cities
   const getSparqlPlaceList = (placeWD: string) => {
       console.log('placeWD',placeWD);
 
