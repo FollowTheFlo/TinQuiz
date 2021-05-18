@@ -62,7 +62,14 @@ const getDBPfromWD = (placeWD: string) => {
     return request$;
   }
 
+  function randomizeChoices<Type>(choices: Type[]): Type[]{
+    const shuffled = choices.sort(() => Math.random() - 0.5);
+    return shuffled;
+
+  }
+
   export {
+      randomizeChoices,
       getDBPfromWD,
       getWDfromDBP,
       randomIntFromInterval,

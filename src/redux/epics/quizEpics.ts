@@ -18,7 +18,7 @@ import { getSparqlFilmChoice } from '../shared/services/filmSPARQL';
 import { Question, Flag } from '../reducers/QuizReducer'
 import { Location } from '../reducers/GeoReducer';
 import { getSparqlCountryWDCodeURIs, getSparqlFlagList } from '../shared/services/flagSPARQL';
-import { randomIntFromInterval } from '../shared/services/utilitySPARQL';
+import { randomIntFromInterval, randomizeChoices } from '../shared/services/utilitySPARQL';
 import { questionCinemaList } from '../shared/config/queriesCinemaList';
 import { questionGeoList } from '../shared/config/queriesGeoList';
 import { questionCelebList } from '../shared/config/queriesCelebList';
@@ -215,31 +215,31 @@ interface localQuestionParams extends QuestionParams {
                         let questionListwithTheme:any[];
                         switch (action.params.theme) {
                             case Theme.ALL: {
-                                questionListwithTheme = questionAllList;
+                                questionListwithTheme = randomizeChoices(questionAllList);
                                 break;
                             }
                             case Theme.CINEMA: {
-                                questionListwithTheme = questionCinemaList;
+                                questionListwithTheme = randomizeChoices(questionCinemaList);
                                 break;
                             }
                             case Theme.GEO: {
-                                questionListwithTheme = questionGeoList;
+                                questionListwithTheme = randomizeChoices(questionGeoList);
                                 break;
                             }
                             case Theme.CELEBRITIES: {
-                                questionListwithTheme = questionCelebList;
+                                questionListwithTheme = randomizeChoices(questionCelebList);
                                 break;
                             }
                             case Theme.FOOD: {
-                                questionListwithTheme = questionFoodList;
+                                questionListwithTheme = randomizeChoices(questionFoodList);
                                 break;
                             }
                             case Theme.ENTERPRISES: {
-                                questionListwithTheme = questionEnterpriseList;
+                                questionListwithTheme = randomizeChoices(questionEnterpriseList);
                                 break;
                             }
                             default: {
-                                questionListwithTheme = questionAllList;
+                                questionListwithTheme = randomizeChoices(questionAllList);
                             }
                         }
                         // we stringify to take advantage of rxJS opeator 'from' which accept string only (not objects like QuestionParams)
