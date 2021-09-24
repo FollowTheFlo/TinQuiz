@@ -16,7 +16,11 @@
 
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-    <link rel="shortcut icon" type="image/png" href="%PUBLIC_URL%/assets/icon/favicon.png" />
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="%PUBLIC_URL%/assets/icon/favicon.png"
+    />
 
     <!-- add to homescreen for ios -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -24,8 +28,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   </head>
 
-  <body style="background-color: rgb(220, 220, 220)">
+  <body
+    style="
+      background-color: rgb(220, 220, 220);
+      max-width: 420px;
+      min-width: 370;
+      max-height: 750px;
+      min-height: 600px;
+      text-align: center;
+      border: 1px solid grey;
+    "
+  >
     <div id="root"></div>
   </body>
-
 </html>
