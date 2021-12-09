@@ -18,3 +18,7 @@ npm run start
 
 <p>Redux Architecture</p>
 <img src="http://florentletendre.com/images/redux_diagram.png" height='700px'></img>
+<p>Data Structure</p>
+<img src="http://florentletendre.com/images/tinquiz_data_structure.png"></img>
+<p>Use Redux Chrome plugin to explore State & Actions</p>
+<img src="http://florentletendre.com/images/redux_plugin.png" ></img>
