@@ -1,31 +1,27 @@
-import React, { useContext, useEffect } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonSlides, IonSlide } from '@ionic/react';
-import './Quizes.css';
-import { RootState } from '../redux/reducers';
-import { useSelector, useDispatch } from 'react-redux';
-import HistoryElement from '../components/HistoryElement';
-import { HistoryItem } from '../redux/reducers/UquizReducer';
-import FlagSlide from '../components/FlagSlide';
-import { Flag } from '../redux/reducers/QuizReducer';
-import  ActionCreators  from "../redux/actions";
+import React from "react";
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
+import "./Quizes.css";
+import { RootState } from "../redux/reducers";
+import { useSelector } from "react-redux";
+import HistoryElement from "../components/HistoryElement";
+import { HistoryItem } from "../redux/reducers/UquizReducer";
 
 const Quizes: React.FC = () => {
-
-
-  const uQuizState = (state:RootState) => ({
+  const uQuizState = (state: RootState) => ({
     historyItems: state.uQuiz.historyItems,
   });
 
   const { historyItems } = useSelector(uQuizState);
 
-  const historyContent =   
-  historyItems.map((item: HistoryItem) => {   
-    return (<HistoryElement 
-      key = {item.id} 
-      historyItem = {item}
-    />)
-    })
-
+  const historyContent = historyItems.map((item: HistoryItem) => {
+    return <HistoryElement key={item.id} historyItem={item} />;
+  });
 
   return (
     <IonPage>
@@ -35,11 +31,7 @@ const Quizes: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent class="backGroundStyle">
-
-        {
-          historyItems && historyItems.length>0 && historyContent
-        }
-        
+        {historyItems && historyItems.length > 0 && historyContent}
       </IonContent>
     </IonPage>
   );

@@ -1,20 +1,20 @@
-import React from 'react';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButton, IonImg, IonSlide } from '@ionic/react';
-import { QwantArticle } from './../redux/store';
-import { Question, Flag } from '../redux/reducers/QuizReducer';
+import React from "react";
+import { IonCard, IonCardHeader, IonImg, IonSlide } from "@ionic/react";
+import { Flag } from "../redux/reducers/QuizReducer";
 
-
-const FlagSlide: React.FC<{ flag: Flag, key:string, selectFlag:any}> = props => {
+const FlagSlide: React.FC<{ flag: Flag; key: string; selectFlag: any }> = (
+  props
+) => {
   return (
-      <IonSlide>
-        <IonCard onClick={() => props.selectFlag(props.flag)}
-        color = { props.flag.isSelected ? 'success' : ''}
-        >
-        <IonCardHeader >
-            
-            <IonImg src={props.flag.image} />
+    <IonSlide>
+      <IonCard
+        onClick={() => props.selectFlag(props.flag)}
+        color={props.flag.isSelected ? "success" : ""}
+      >
+        <IonCardHeader>
+          <IonImg src={props.flag.image} />
         </IonCardHeader>
-        </IonCard>
+      </IonCard>
     </IonSlide>
   );
 };
