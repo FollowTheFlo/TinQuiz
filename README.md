@@ -9,7 +9,8 @@ npm run start
 						<br/>This app was developed to practice React, redux architecture with redux-observable library. No server needed, quiz data are fetched from WikiData/DBPedia/IMDB web services.
 					</p>
 <p>Technology : React, Ionic, Redux architecture, redux-observable, RxJS, Firebase, DBpedia, ImDB</p>
-					<p> Link : <a href='https://tinquiz.com' target='_blank'>https://tinquiz.com</a>
+					<p> Link : <a href='https://tinquiz.com' target='_blank'>https://tinquiz.com</a><br/>
+	 <a href='https://florentletendre.com/videos/tinquiz_demo.mp4' target='_blank'>Demo video</a>
 
 <img src="http://florentletendre.com/images/tq1.png" height='350px'></img>
 <img src="http://florentletendre.com/images/tq2.png" height='350px'></img>
