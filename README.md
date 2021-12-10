@@ -2,8 +2,9 @@
 deployed on <a href='https://tinquiz.com' target='_blank'>https://tinquiz.com</a>
 
 To run on localhost:3000 <br/>
-clone this repository then <br/>
-npm run start
+- clone this repository <br/>
+- npm install
+- npm run start
 <h2>DBPedia-based Images Quiz-generator (2020)</h2>
 <p> Quizzes based on country and specific theme (All, cinema, geography, celebrities, food, enterprises), fast answers with right-wrong image, gamification with badges.
 						<br/>This app was developed to practice React, redux architecture with redux-observable library. No server needed, quiz data are fetched from WikiData/DBPedia/IMDB web services.
