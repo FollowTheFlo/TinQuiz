@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { IonSegment, IonSegmentButton, IonLabel } from "@ionic/react";
 
 const BadgesSegments: React.FC<{
@@ -6,6 +6,9 @@ const BadgesSegments: React.FC<{
   onSegmentValueChange: any;
   selectedScope: string;
 }> = (props) => {
+  useEffect(() => {
+    console.log("in BadgesSegments");
+  });
   return (
     <IonSegment
       scrollable={false}
@@ -22,4 +25,4 @@ const BadgesSegments: React.FC<{
   );
 };
 
-export default BadgesSegments;
+export default React.memo(BadgesSegments);

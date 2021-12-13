@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   IonContent,
   IonHeader,
@@ -31,8 +31,12 @@ const Badges: React.FC = () => {
   const [scope, setScope] = useState("USER");
 
   useEffect(() => {
-    console.log("Badges UseEffect");
+    console.log("Badges UseEffect once");
     dispatch(ActionCreators.quizActions.runFlags());
+  }, []);
+
+  const emptyFct = useCallback(() => {
+    console.log("emptyFct");
   }, []);
 
   const badgesList = (badges: Badge[], filter: string) => {
@@ -61,11 +65,11 @@ const Badges: React.FC = () => {
                 // return stylingBadges(badges,flag, cat);
                 return (
                   <BadgeElement
-                    key={flag.WdCode + cat + flag.label}
+                    key={flag.WdCode + cat + flag.label + scope}
                     flag={flag}
                     badges={badges}
                     theme={cat}
-                    selectBadge={() => {}}
+                    selectBadge={() => emptyFct()}
                   />
                 );
               })}
@@ -74,10 +78,15 @@ const Badges: React.FC = () => {
       });
   };
 
-  const segmentChangeHandler = (scope: string) => {
-    console.log("segmentChangeHandler", scope);
-    setScope(scope);
-  };
+  // avoid re-evaluation at every state change with useCallback.
+  // does not recreate a ref everytime, keeps very first ref, focus only on 'scope' param changes
+  const segmentChangeHandler = useCallback(
+    (scope: string) => {
+      console.log("segmentChangeHandler", scope);
+      setScope(scope);
+    },
+    [scope]
+  );
 
   return (
     <IonPage>
