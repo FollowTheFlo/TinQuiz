@@ -16,6 +16,7 @@ import ActionCreators from "../redux/actions";
 import BadgeElement from "../components/BadgeElement";
 import { Theme } from "../redux/constants";
 import BadgesSegments from "../components/BadgesSegment";
+import BadgesList from "../components/BadgesList";
 
 const Badges: React.FC = () => {
   //const categories = [Theme.ALL,Theme.CINEMA,Theme.FOOD,Theme.CELEBRITIES,Theme.GEO,Theme.ENTERPRISES];
@@ -35,58 +36,12 @@ const Badges: React.FC = () => {
     dispatch(ActionCreators.quizActions.runFlags());
   }, []);
 
-  const emptyFct = useCallback(() => {
-    console.log("emptyFct");
-  }, []);
-
-  const badgesList = (badges: Badge[], filter: string) => {
-    return flags
-      .filter((flag) => {
-        if (filter === "USER") {
-          return badges.findIndex((b) => b.countryWD === flag.WdCode) != -1;
-        }
-        return true;
-      })
-      .map((flag) => {
-        return (
-          <IonCol>
-            {categories
-              .filter((cat) => {
-                if (filter === "USER") {
-                  return (
-                    badges.findIndex(
-                      (b) => b.theme === cat && b.countryWD === flag.WdCode
-                    ) != -1
-                  );
-                }
-                return true;
-              })
-              .map((cat) => {
-                // return stylingBadges(badges,flag, cat);
-                return (
-                  <BadgeElement
-                    key={flag.WdCode + cat + flag.label + scope}
-                    flag={flag}
-                    badges={badges}
-                    theme={cat}
-                    selectBadge={() => emptyFct()}
-                  />
-                );
-              })}
-          </IonCol>
-        );
-      });
-  };
-
   // avoid re-evaluation at every state change with useCallback.
   // does not recreate a ref everytime, keeps very first ref, focus only on 'scope' param changes
-  const segmentChangeHandler = useCallback(
-    (scope: string) => {
-      console.log("segmentChangeHandler", scope);
-      setScope(scope);
-    },
-    [scope]
-  );
+  const segmentChangeHandler = useCallback((newScope: string) => {
+    console.log("segmentChangeHandler", newScope);
+    setScope(newScope);
+  }, []);
 
   return (
     <IonPage>
@@ -102,7 +57,9 @@ const Badges: React.FC = () => {
           selectedScope={scope}
         />
         <IonGrid>
-          {flags && flags.length > 0 && badgesList(badgesItems, scope)}
+          {flags && flags.length > 0 && (
+            <BadgesList badges={badgesItems} filter={scope} flags={flags} />
+          )}
         </IonGrid>
       </IonContent>
     </IonPage>
