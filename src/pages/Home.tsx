@@ -13,7 +13,6 @@ import {
   IonItem,
   IonSpinner,
   IonAlert,
-  IonSlides,
   IonSearchbar,
   IonList,
   IonCard,
@@ -37,6 +36,7 @@ import ResultPanel from "../components/ResultPanel";
 import BadgeElement from "../components/BadgeElement";
 import { Badge } from "../redux/reducers/UquizReducer";
 import FlagSlides from "../components/FlagSlides";
+import BadgesTile from "../components/BadgesTile";
 
 const Home: React.FC = () => {
   const slidesRef = useRef<HTMLIonSlidesElement>(null);
@@ -275,24 +275,20 @@ const Home: React.FC = () => {
     []
   );
 
-  const badgesList = (badges: Badge[]) => {
+  // const selectBadgeHandler = useCallback(() => {
+  //   console.log("selectBadgeHandler");
+  // }, []);
+
+  const badgesTile = (badges: Badge[]) => {
     const themesList = Object.values(Theme);
 
     return (
-      <div>
-        {themesList.map((theme) => {
-          // return stylingBadges(badges,flag, cat);
-          return (
-            <BadgeElement
-              key={selectedFlag.WdCode + theme}
-              flag={selectedFlag}
-              badges={badges}
-              theme={theme}
-              selectBadge={selectBadgeHandler}
-            />
-          );
-        })}
-      </div>
+      <BadgesTile
+        themesList={themesList}
+        selectedFlag={selectedFlag}
+        badges={badges}
+        selectBadge={selectBadgeHandler}
+      />
     );
   };
 
@@ -459,7 +455,7 @@ const Home: React.FC = () => {
                   <IonCardHeader>
                     <IonCardTitle>Unlock Badges</IonCardTitle>
                   </IonCardHeader>
-                  <IonCardContent>{badgesList(badgesItems)}</IonCardContent>
+                  <IonCardContent>{badgesTile(badgesItems)}</IonCardContent>
                 </IonCard>
               )}
             </IonCol>
