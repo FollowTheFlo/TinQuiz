@@ -26,6 +26,7 @@ import {
   SelectFlagAction,
   LaunchQuizAction,
 } from "../actions/quizActions";
+import { localFlagsList } from "../shared/config/flagsList";
 
 export interface Quiz {
   id: string;
@@ -75,12 +76,13 @@ export interface Flag {
 }
 
 const initialState = {
-  flags: [],
+  flags: localFlagsList,
   loadingFlags: true,
   selectedFlag: {
-    label: "France",
-    image: "image",
-    WdCode: "Q142",
+    label: "Canada",
+    image:
+      "http://commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Canada_(Pantone).svg?width=300",
+    WdCode: "Q16",
     isSelected: true,
   },
   quiz: {
@@ -91,14 +93,14 @@ const initialState = {
     theme: "ALL",
     location: {
       id: "0",
-      place: "Saint-James",
-      region: "Manche",
-      country: "France",
-      placeWD: "Q478259",
+      place: "Montreal",
+      region: "Quebec",
+      country: "Canada",
+      placeWD: "Q340",
       regionWD: "Q12589",
-      countryWD: "Q142",
-      lat: -1.325183,
-      lng: 48.523252,
+      countryWD: "Q16",
+      lat: -73.576815,
+      lng: 45.510924,
     },
     distractor: {
       place: ["Montreal"],
@@ -270,6 +272,8 @@ export const quizReducer = (
       if (index !== -1) {
         updatedFlags[index].isSelected = true;
       }
+      console.log("all flags", updatedFlags);
+      console.log("flag index", index);
 
       return {
         ...state,
