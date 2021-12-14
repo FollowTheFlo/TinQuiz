@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   IonContent,
   IonHeader,
@@ -30,13 +30,13 @@ import { RootState } from "../redux/reducers";
 import QuestionItem from "../components/QuestionItem";
 import { Question, Flag } from "../redux/reducers/QuizReducer";
 import { Location } from "../redux/reducers/GeoReducer";
-import FlagSlide from "../components/FlagSlide";
 import SearchItem from "../components/SearchItem";
 import ThemeSegments from "../components/ThemeSegments";
 import { Theme } from "../redux/constants";
 import ResultPanel from "../components/ResultPanel";
 import BadgeElement from "../components/BadgeElement";
 import { Badge } from "../redux/reducers/UquizReducer";
+import FlagSlides from "../components/FlagSlides";
 
 const Home: React.FC = () => {
   const slidesRef = useRef<HTMLIonSlidesElement>(null);
@@ -70,7 +70,7 @@ const Home: React.FC = () => {
 
   //global state
   const { location, geoErrorMessage, geoLoading } = useSelector(geoState);
-  const { quizLoading, questions, flags, selectedFlag, loadingFlags } =
+  const { quizLoading, questions, flags, selectedFlag } =
     useSelector(quizState);
   const {
     questionIndex,
@@ -84,10 +84,10 @@ const Home: React.FC = () => {
   } = useSelector(uQuizState);
 
   //Local state
-  const [searchText, setSearchText] = useState("Saint-James");
+  const [searchText, setSearchText] = useState("Montreal");
   const [isFlagSelected, setIsFlagSelected] = useState(false);
   const [suggestionCountryList, setSuggestionCountryList] = useState([
-    { label: "France", image: "", WdCode: "Q142", isSelected: false },
+    { label: "Canada", image: "", WdCode: "Q16", isSelected: false },
   ]);
   const [isTyping, setIsTyping] = useState(false);
 
@@ -100,7 +100,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     console.log("useEffect location", location);
     setSearchText(location.country);
-    console.log("selectFlag1");
+    console.log("selectFlag1", selectedFlag);
     if (location.countryWD) {
       dispatch(
         ActionCreators.quizActions.selectFlag({
@@ -111,35 +111,10 @@ const Home: React.FC = () => {
   }, [location]);
 
   useEffect(() => {
-    console.log("useEffect selectedFlag", selectedFlag.WdCode);
-    // display flags slider with current selected flag in middle
-    if (slidesRef.current?.slideTo && selectedFlag.WdCode !== undefined) {
-      //find index of selected flag
-      console.log("In Condition FLAGS", flags);
-      let index = flags.findIndex((f) => f.WdCode === selectedFlag.WdCode);
-      //there are 3 flags in screen, set the selected one in the middle, so poisition index-1
-      index = index === 0 ? index : index - 1;
-      slidesRef.current?.slideTo(index, 500);
-    }
-  }, [selectedFlag]);
-
-  useEffect(() => {
     // first access
     dispatch(ActionCreators.quizActions.runFlags());
     dispatch(ActionCreators.userQuizActions.startApp());
   }, []);
-
-  useEffect(() => {
-    if (!loadingFlags && slidesRef.current?.slideTo) {
-      console.log("useEffect flags1");
-      console.log("selectFlag2");
-      dispatch(
-        ActionCreators.quizActions.selectFlag({
-          WdCode: location.countryWD,
-        })
-      );
-    }
-  }, [loadingFlags]);
 
   //////////buttons handlers
 
@@ -259,7 +234,8 @@ const Home: React.FC = () => {
   };
 
   //////Flags////////
-  const selectFlagHandler = (flag: Flag) => {
+  const selectFlagHandler = useCallback((flag: Flag) => {
+    console.log("selectFlagHandler");
     setIsFlagSelected(true);
     setSearchText(flag.label);
     dispatch(ActionCreators.geoActions.setLocationFromFlag({ flag }));
@@ -268,22 +244,7 @@ const Home: React.FC = () => {
         WdCode: flag.WdCode,
       })
     );
-  };
-
-  const flagSlides = flags.map((flag) => {
-    return (
-      <FlagSlide flag={flag} key={flag.WdCode} selectFlag={selectFlagHandler} />
-    );
-  });
-
-  ///flag Slides Options
-  const slideOpts = {
-    initialSlide: 5,
-    speed: 500,
-    direction: "horizontal",
-    height: 100,
-    slidesPerView: 3,
-  };
+  }, []);
 
   //////Theme Segments/////
   const segmentChangeHandler = (theme: string) => {
@@ -298,18 +259,21 @@ const Home: React.FC = () => {
   };
 
   ////////Badges////////////
-  const selectBadgeHandler = (flag: Flag, badge: Badge, theme: string) => {
-    setSearchText(flag.label);
-    setQuizTheme(theme);
-    dispatch(ActionCreators.geoActions.setLocationFromFlag({ flag }));
-    console.log("selectFlagBadge");
-    dispatch(
-      ActionCreators.quizActions.selectFlag({
-        WdCode: flag.WdCode,
-      })
-    );
-    runQuestions(location, theme);
-  };
+  const selectBadgeHandler = useCallback(
+    (flag: Flag, badge: Badge, theme: string) => {
+      setSearchText(flag.label);
+      setQuizTheme(theme);
+      dispatch(ActionCreators.geoActions.setLocationFromFlag({ flag }));
+      console.log("selectFlagBadge");
+      dispatch(
+        ActionCreators.quizActions.selectFlag({
+          WdCode: flag.WdCode,
+        })
+      );
+      runQuestions(location, theme);
+    },
+    []
+  );
 
   const badgesList = (badges: Badge[]) => {
     const themesList = Object.values(Theme);
@@ -414,14 +378,12 @@ const Home: React.FC = () => {
           <IonRow>
             <IonCol offset="0" size="12">
               {!isQuizOpened && (
-                <IonSlides
-                  id="flagsSlide"
-                  pager={false}
-                  options={slideOpts}
-                  ref={slidesRef}
-                >
-                  {flags && flags.length > 0 && flagSlides}
-                </IonSlides>
+                <FlagSlides
+                  flags={flags}
+                  selectedFlag={selectedFlag}
+                  selectFlag={selectFlagHandler}
+                  slidesRef={slidesRef}
+                />
               )}
             </IonCol>
           </IonRow>

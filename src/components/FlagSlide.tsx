@@ -1,14 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { IonCard, IonCardHeader, IonImg, IonSlide } from "@ionic/react";
 import { Flag } from "../redux/reducers/QuizReducer";
 
-const FlagSlide: React.FC<{ flag: Flag; key: string; selectFlag: any }> = (
-  props
-) => {
+const FlagSlide: React.FC<{
+  flag: Flag;
+  key: string;
+  selectedFlagChanged: any;
+}> = (props) => {
+  useEffect(() => {
+    console.log("FlagSlide");
+  });
   return (
     <IonSlide>
       <IonCard
-        onClick={() => props.selectFlag(props.flag)}
+        onClick={() => props.selectedFlagChanged(props.flag)}
         color={props.flag.isSelected ? "success" : ""}
       >
         <IonCardHeader>
