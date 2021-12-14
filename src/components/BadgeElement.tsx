@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { IonIcon } from "@ionic/react";
 import { Flag } from "../redux/reducers/QuizReducer";
 import { Badge } from "../redux/reducers/UquizReducer";
@@ -25,6 +25,10 @@ const BadgeElement: React.FC<{
     (badge) =>
       badge.countryWD === props.flag.WdCode && badge.theme === props.theme
   );
+
+  useEffect(() => {
+    console.log("in BadgeElement", props.flag);
+  });
 
   //if user has won this badge, set the correct color
   if (userBadge) {
