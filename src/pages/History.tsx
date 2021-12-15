@@ -6,13 +6,13 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import "./Quizes.css";
+import "./History.css";
 import { RootState } from "../redux/reducers";
 import { useSelector } from "react-redux";
 import HistoryElement from "../components/HistoryElement";
 import { HistoryItem } from "../redux/reducers/UquizReducer";
 
-const Quizes: React.FC = () => {
+const History: React.FC = () => {
   const uQuizState = (state: RootState) => ({
     historyItems: state.uQuiz.historyItems,
   });
@@ -37,4 +37,4 @@ const Quizes: React.FC = () => {
   );
 };
 
-export default Quizes;
+export default History;
