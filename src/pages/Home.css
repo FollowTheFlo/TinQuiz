@@ -21,6 +21,14 @@
   padding-top: 0px;
 }
 
+.errorStyle {
+  font-size: 22px;
+  font-weight: bold;
+  padding-bottom: 25px;
+  padding-top: 0px;
+  color: red;
+}
+
 .foreGroundStyle {
   --background: var(--ion-color-primary);
   background-color: var(--ion-color-primary);
