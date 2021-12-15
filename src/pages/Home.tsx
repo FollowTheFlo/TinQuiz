@@ -70,7 +70,7 @@ const Home: React.FC = () => {
 
   //global state
   const { location, geoErrorMessage, geoLoading } = useSelector(geoState);
-  const { quizLoading, questions, flags, selectedFlag } =
+  const { quizLoading, questions, flags, selectedFlag, quizErrorMessage } =
     useSelector(quizState);
   const {
     questionIndex,
@@ -259,6 +259,7 @@ const Home: React.FC = () => {
   };
 
   ////////Badges////////////
+  /// fct passed to child, useCallback to keep first ref, avoid unecessary reevaluation
   const selectBadgeHandler = useCallback(
     (flag: Flag, badge: Badge, theme: string) => {
       setSearchText(flag.label);
@@ -274,10 +275,6 @@ const Home: React.FC = () => {
     },
     []
   );
-
-  // const selectBadgeHandler = useCallback(() => {
-  //   console.log("selectBadgeHandler");
-  // }, []);
 
   const badgesTile = (badges: Badge[]) => {
     const themesList = Object.values(Theme);
@@ -313,12 +310,20 @@ const Home: React.FC = () => {
         <IonCol size="10" className="mainTitle">
           {selectedFlag.label} - {quizTheme}
         </IonCol>
+
         <IonCol size="2">
           <IonButton onClick={hideQuiz}>
             <IonIcon icon={closeCircleOutline}></IonIcon>
           </IonButton>
         </IonCol>
       </IonRow>
+      {quizErrorMessage && (
+        <IonRow>
+          <IonCol size="12" className="errorStyle">
+            {quizErrorMessage}
+          </IonCol>
+        </IonRow>
+      )}
       <IonRow>
         <IonCol size="12" className="centerText">
           {questions.length > 0 && currentScore}

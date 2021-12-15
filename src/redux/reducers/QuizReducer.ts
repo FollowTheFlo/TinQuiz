@@ -15,6 +15,7 @@ import {
   FILL_FLAGS,
   SELECT_FLAG,
   LAUNCH_QUIZ,
+  CLEAR_QUIZ_ERROR,
 } from "./../constants";
 import {
   FillQuizAction,
@@ -33,6 +34,8 @@ export interface Quiz {
   subject: string;
   locale: string;
   questions: Question[];
+  templateQuestionsCount: number;
+  ignoredQuestionsCount: number;
   distractor: Distractor;
   location: Location;
   theme: string;
@@ -90,6 +93,8 @@ const initialState = {
     subject: "yo",
     locale: "en",
     questions: [],
+    templateQuestionsCount: 5,
+    ignoredQuestionsCount: 3,
     theme: "ALL",
     location: {
       id: "0",
@@ -166,6 +171,9 @@ export const quizReducer = (
         loading: true,
         quiz: {
           ...state.quiz,
+          templateQuestionsCount:
+            runDistractorAction.payload.templateQuestionsCount,
+          ignoredQuestionsCount: 0,
           location: runDistractorAction.payload.location,
           subject: `${runDistractorAction.payload.location.place} - ${runDistractorAction.payload.location.region} - ${runDistractorAction.payload.location.country}`,
         },
@@ -206,6 +214,7 @@ export const quizReducer = (
       return {
         ...state,
         loading: false,
+        errorMessage: "",
         quiz: {
           ...state.quiz,
           location: { ...state.quiz.location },
@@ -237,9 +246,24 @@ export const quizReducer = (
     }
     case IGNORE_QUESTION: {
       console.log("REDUCER - IGNORE_QUESTION: ");
-
+      // if all questions are ignored, trigger error message
+      // if error message, stop loading
       return {
         ...state,
+        errorMessage:
+          state.quiz.ignoredQuestionsCount + 1 ===
+          state.quiz.templateQuestionsCount
+            ? "No questions found"
+            : state.errorMessage,
+        quiz: {
+          ...state.quiz,
+          ignoredQuestionsCount: state.quiz.ignoredQuestionsCount + 1,
+        },
+        loading:
+          state.quiz.ignoredQuestionsCount + 1 ===
+          state.quiz.templateQuestionsCount
+            ? false
+            : state.loading,
       };
     }
     case RUN_FLAGS: {
@@ -258,6 +282,14 @@ export const quizReducer = (
         ...state,
         flags: fillFlagsAction.payload.flags,
         loadingFlags: false,
+      };
+    }
+    case CLEAR_QUIZ_ERROR: {
+      console.log("REDUCER - CLEAR_QUIZ_ERROR: ");
+
+      return {
+        ...state,
+        errorMessage: "",
       };
     }
     case SELECT_FLAG: {

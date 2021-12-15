@@ -11,17 +11,19 @@ import {
   Theme,
   LAUNCH_QUIZ,
   FILL_DISTRACTOR,
+  COUNT_EXPECTED_QUESTIONS_LIST,
 } from "../constants";
 import {
   RunQuestionAction,
   QuestionParams,
   RunDistractorAction,
   RunQuestionsListAction,
+  LaunchQuizAction,
 } from "../actions/quizActions";
 import {
   getSparqlCountryList,
-  getSparqlRegionList,
   getSparqlPlaceList,
+  getSparqlRegionList,
 } from "../shared/services/distractorSPARQL";
 import { questionAllList } from "../shared/config/queriesLists";
 import { from, of } from "rxjs";
@@ -40,9 +42,11 @@ import { questionFoodList } from "../shared/config/queriesFoodList";
 import { questionEnterpriseList } from "../shared/config/queriesEnterpriseList";
 import { localFlagsList } from "../shared/config/flagsList";
 
+// fetch distractors from selected country
+// return list of distractor with their country / countryWD pairs(eg: Canada / Q16)
 export const quizEpic: Epic<Action> = (action$, state$) => {
   let location: Location;
-  let distractor = {
+  let distractors = {
     place: [""],
     placeWD: [""],
     region: [""],
@@ -53,65 +57,64 @@ export const quizEpic: Epic<Action> = (action$, state$) => {
   return action$.pipe(
     ofType<any>(RUN_DISTRACTOR),
     tap(() => console.log("EPIC - RUN_DISTRACTOR")),
-
-    // mapTo({ type: 'PLACE_ADDED'})
     concatMap((action: RunDistractorAction) => {
       console.log("FillQuizAction switchMap", state$);
       location = { ...action.payload.location };
       if (!location.countryWD) {
-        console.log("empty1");
+        console.log("empty country code");
         return of({});
       }
+      // get distratctor countries from WikiData eg:target is france, distractor: Germany, Belgium, Spain
+      // we take 5 random countries from same continent, at least 1 millions population,
+      // if country too small -> not enough articles -> end up with empty questions
       return getSparqlCountryList(location.countryWD);
     }),
-    concatMap((response: any) => {
-      console.log("countryWD test empty");
+    // concatMap((response: any) => {
+    //   console.log("countryWD test empty");
+    //   if (response) {
+    //     console.log("ajax1", response);
+    //     //receiving list of dsitractor countries {label,code} from getSparqlCountryList
+    //     distractors.country = response.map((obj: any) => obj.label);
+    //     distractors.countryWD = response.map((obj: any) => obj.code);
+    //     console.log("distractor1", distractors);
+    //   } else {
+    //     console.log("countryWD was empty");
+    //   }
+
+    //   if (!location.regionWD) {
+    //     console.log("empty regionWD");
+    //     return of({});
+    //   }
+    //   return getSparqlRegionList(location.regionWD);
+    // }),
+    // concatMap((response: any) => {
+    //   console.log("ajax2", response);
+    //   if (response[0]) {
+    //     distractors.region[0] = response[0].label;
+    //     distractors.regionWD[0] = response[0].code;
+    //   }
+
+    //   console.log("distractor1", distractors);
+    //   if (!location.placeWD) {
+    //     console.log("empty3");
+    //     return of({});
+    //   }
+    //   return getSparqlPlaceList(location.placeWD);
+    // }),
+    map((response: any) => {
       if (response) {
         console.log("ajax1", response);
         //receiving list of dsitractor countries {label,code} from getSparqlCountryList
-        distractor.country = response.map((obj: any) => obj.label);
-        distractor.countryWD = response.map((obj: any) => obj.code);
-        console.log("distractor1", distractor);
+        distractors.country = response.map((obj: any) => obj.label);
+        distractors.countryWD = response.map((obj: any) => obj.code);
+        console.log("distractor1", distractors);
       } else {
         console.log("countryWD was empty");
       }
-
-      if (!location.regionWD) {
-        console.log("empty regionWD");
-        return of({});
-      }
-      return getSparqlRegionList(location.regionWD);
-    }),
-    concatMap((response: any) => {
-      console.log("ajax2", response);
-      if (response[0]) {
-        distractor.region[0] = response[0].label;
-        distractor.regionWD[0] = response[0].code;
-      }
-
-      console.log("distractor1", distractor);
-      if (!location.placeWD) {
-        console.log("empty3");
-        return of({});
-      }
-      return getSparqlPlaceList(location.placeWD);
-    }),
-
-    map((response: any) => {
-      console.log("ajax3", response);
-      if (response[0]) {
-        distractor.place[0] = response[0].label;
-        distractor.placeWD[0] = response[0].code;
-        console.log("distractor3", distractor);
-      } else {
-        console.log("location.placeWD was empty");
-      }
-
+      // distractors countries have been fetcehd, fill the state
       return ActionCreators.quizActions.fillDistractors({
-        distractor: distractor,
+        distractor: distractors,
       });
-
-      //return qArticles;
     })
   );
 };
@@ -126,20 +129,21 @@ export const questionEpic: Epic<Action> = (action$, state$) => {
   let inputEl: any;
   let actionParams: localQuestionParams;
 
+  // from question template -> pick one random distractor -> fill with data from WikiData server -> add in on Question List state
   return action$.pipe(
     ofType<any>(RUN_QUESTION),
     tap(() => console.log("EPIC - RUN_QUESTION")),
 
     concatMap((action: RunQuestionAction) => {
       const randomIndex = randomIntFromInterval(
-        0,
+        0, //list of distractor countries in  quiz.distractor.country[]
         state$.value.quiz.quiz.distractor[action.params.type].length - 1
       );
       console.log("randomIndex", randomIndex);
       console.log(
         "randomIndex Length",
         state$.value.quiz.quiz.distractor[action.params.type].length - 1
-      );
+      ); // eg {code:Q790,area:canada,correctArea:Haiti,}
       actionParams = {
         ...action.params,
         code: action.params.isDistractor
@@ -158,42 +162,78 @@ export const questionEpic: Epic<Action> = (action$, state$) => {
         return getSparqlFilmChoice(actionParams.topic, actionParams.code);
       }
 
+      // query Wikidata based on topic (eg:Food) and countryCode: eg:Q16 which is Canada
+      // 50max articles on country/topic are fetched and cached , if same country/topic needed later, pick from cache
       return getSparqlChoice(actionParams.topic, actionParams.code);
     }),
 
     map((response: Article) => {
+      // erronated article with empty image or label, ignore question
       if (response.image === "" || response.label === "") {
         return ActionCreators.quizActions.ignoreQuestion();
       }
 
-      console.log("FINAL EPIC", inputEl);
       const question: Question = {
-        id: Date.now().toString(),
+        id: Date.now().toString(), // unique Id
         geoType: actionParams.type,
         topic: actionParams.topic,
-        phrase: `${QUESTIONS_MAP[actionParams.topic]} ${actionParams.area} ?`,
-        subPhrase: state$.value.quiz.quiz.location[actionParams.type],
-        correct: actionParams.isDistractor ? false : true,
+        phrase: `${QUESTIONS_MAP[actionParams.topic]} ${actionParams.area} ?`, // title, eg: Food from Canada
+        subPhrase: state$.value.quiz.quiz.location[actionParams.type], // type 'country': eg: country, type 'place': eg: Montreal
+        correct: actionParams.isDistractor ? false : true, // correct answer is yes or no
         correctArea: actionParams.correctArea,
         image: response.image,
         label: response.label,
-      };
+      }; // new question added to quiz questions list using FILL_QUESTION action
       return ActionCreators.quizActions.fillQuestion({ question: question });
     })
   );
 };
 
+// 1st step of launch quiz is to fetch distractors country that will give us false answer's
 export const launchQuizEpic: Epic<Action> = (action$, state$) =>
   action$.pipe(
-    ofType<Action>(LAUNCH_QUIZ),
+    ofType<any>(LAUNCH_QUIZ),
     tap(() => console.log("EPIC - LAUNCH_QUIZ")),
-    map(() => {
+    map((action: LaunchQuizAction) => {
+      console.log("action.params.theme", action.params.theme);
+      let questionsCount = 0;
+      switch (action.params.theme) {
+        case Theme.ALL: {
+          questionsCount = questionAllList.length;
+          break;
+        }
+        case Theme.CINEMA: {
+          questionsCount = questionCinemaList.length;
+          break;
+        }
+        case Theme.GEO: {
+          questionsCount = questionGeoList.length;
+          break;
+        }
+        case Theme.CELEBRITIES: {
+          questionsCount = questionCelebList.length;
+          break;
+        }
+        case Theme.FOOD: {
+          questionsCount = questionFoodList.length;
+          break;
+        }
+        case Theme.ENTERPRISES: {
+          questionsCount = questionEnterpriseList.length;
+          break;
+        }
+        default: {
+          questionsCount = questionAllList.length;
+        }
+      }
       return ActionCreators.quizActions.runDistractor({
         location: state$.value.geo.location,
+        templateQuestionsCount: questionsCount,
       });
     })
   );
 
+// confirmation distractors are present, we can now run questions list that will fetch articles from wikidata
 export const fillDistractorEpic: Epic<Action> = (action$, state$) =>
   action$.pipe(
     ofType<Action>(FILL_DISTRACTOR),
@@ -205,6 +245,8 @@ export const fillDistractorEpic: Epic<Action> = (action$, state$) =>
     })
   );
 
+//1. form theme (eg:Food) -> get questions template of this theme, templates defined number of true/false questions.
+//2. for each question template run question one by one
 export const runQuestionListEpic: Epic<Action> = (action$, state$) => {
   return action$.pipe(
     ofType<any>(RUN_QUESTIONS_LIST),
@@ -246,16 +288,14 @@ export const runQuestionListEpic: Epic<Action> = (action$, state$) => {
         JSON.stringify(q)
       );
       console.log("questionsJSON", questionsJSON);
-      return from(questionsJSON);
+      return from(questionsJSON); // question stream one after the other thx to concatMap opeator
     }),
     //  delay(1000),
     map((questionJSON: any) => {
       // Parse to get the object QuestionParams from Json string
       const questionParams: QuestionParams = JSON.parse(questionJSON);
       console.log("questionParams", questionParams);
-      if (questionParams.topic === "end") {
-        return ActionCreators.quizActions.endQuestionsList();
-      }
+      //runQuetions action 1 by 1 (due to from()operator) until end of list
       return ActionCreators.quizActions.runQuestion(questionParams);
     })
   );
@@ -266,6 +306,7 @@ export const FillQuizEpic: Epic<Action> = (action$, state$) => {
     ofType<any>(FILL_QUIZ),
     tap(() => console.log("EPIC - FILL_QUIZ")),
     map((action: any) => {
+      // create unique Id using now date
       const id = Date.now().toString();
       return ActionCreators.quizActions.setQuizId({
         quizId: id,
@@ -282,37 +323,5 @@ export const RunFlagsEpic: Epic<Action> = (action$, state$) => {
         flags: localFlagsList,
       });
     })
-    // concatMap((action:Action) => {
-    // //set any country as parameter, just use to get Hypernym in getSparqlCountryWDCodeURIs
-    //       return getSparqlCountryWDCodeURIs('Q30');
-
-    //      } ),
-    // concatMap((response:any[]) => {
-    // console.log('RUN_FLAGS response', response);
-    // if(!response) {
-    //     //return of(ActionCreators.geoActions.showGeoErrorMessage("getSparqlFlagList Error"));
-    //     console.log('response is null');
-    //     return of([]);
-    // }
-    // return getSparqlFlagList(response)
-    // .pipe(
-    //     catchError( error => {
-    //        console.log("getUserLatLng",error.message);
-    //        return of(ActionCreators.geoActions.showGeoErrorMessage("getSparqlFlagList Error"));
-    //      }),
-    //     )
-
-    // }),
-    // map((flags:Flag[]) => {
-
-    //     const countryWD = state$.value.quiz.quiz.location.countryWD;
-    //     console.log('Flags', flags, countryWD);
-    //     flags.forEach(f => {
-    //       f.isSelected =  f.WdCode === countryWD ? true : false;
-    //     });
-    //     return ActionCreators.quizActions.fillFlags({
-    //         flags: flags
-    //     });
-    // })
   );
 };
