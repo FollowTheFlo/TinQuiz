@@ -74,13 +74,11 @@ const getSparqlCountryWDCodeURIs = (countryWD: string) => {
   const queryCountryList = `
     SELECT distinct ?countryLabel ?country ?population
         WHERE {
-        wd:${countryWD} wdt:P31 ?hypernym.
-      
+        wd:${countryWD} wdt:P31 ?hypernym.      
         ?country wdt:P31 ?hypernym.
         ?country wdt:P30 ?continent.
         ?country wdt:P1082 ?population.
-        FILTER NOT EXISTS { ?country wdt:P576 ?existedInPast.}
-        FILTER ( ?continent != wd:Q15)
+        FILTER NOT EXISTS { ?country wdt:P576 ?existedInPast.}      
         FILTER ( ?population >= 4000000)
         SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
