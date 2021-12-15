@@ -12,7 +12,7 @@ import {
 import { IonReactRouter } from "@ionic/react-router";
 import { home, time, ribbon } from "ionicons/icons";
 import Home from "./pages/Home";
-import Quizes from "./pages/Quizes";
+import History from "./pages/History";
 import Badges from "./pages/Badges";
 
 /* Core CSS required for Ionic components to work properly */
@@ -47,7 +47,7 @@ const App: React.FC = () => {
           <IonTabs>
             <IonRouterOutlet>
               <Route path="/home" component={Home} exact={true} />
-              <Route path="/quizes" component={Quizes} exact={true} />
+              <Route path="/history" component={History} exact={true} />
               <Route path="/badges" component={Badges} />
               <Route
                 path="/"
@@ -60,7 +60,11 @@ const App: React.FC = () => {
                 <IonIcon icon={home} />
                 <IonLabel>Home</IonLabel>
               </IonTabButton>
-              <IonTabButton tab="quizes" href="/quizes" class="tabButtonStyle">
+              <IonTabButton
+                tab="history"
+                href="/history"
+                class="tabButtonStyle"
+              >
                 <IonIcon icon={time} />
                 <IonLabel>History</IonLabel>
               </IonTabButton>
@@ -74,7 +78,11 @@ const App: React.FC = () => {
                 <IonIcon icon={home} />
                 <IonLabel>Home</IonLabel>
               </IonTabButton>
-              <IonTabButton tab="quizes" href="/quizes" class="tabButtonStyle">
+              <IonTabButton
+                tab="history"
+                href="/history"
+                class="tabButtonStyle"
+              >
                 <IonIcon icon={time} />
                 <IonLabel>History</IonLabel>
               </IonTabButton>
