@@ -1,9 +1,6 @@
-import { Choice } from "./ChoiceReducer";
 import { Action } from "../actions/quizActions";
 import {
   GoNextQuestionAction,
-  StartQuizPayload,
-  StartQuizAction,
   EndQuizAction,
   ShowQuizAction,
   ShowResultPanelAction,
@@ -18,7 +15,7 @@ import {
   SHOW_RESULT_PANEL,
   FILL_BADGES,
 } from "../constants";
-import { Question, Quiz } from "./QuizReducer";
+import { Question } from "./QuizReducer";
 
 export interface Uanswer {
   question: Question;
