@@ -245,15 +245,6 @@ export const quizReducer = (
       };
     }
     case IGNORE_QUESTION: {
-      console.log(
-        "REDUCER - IGNORE_QUESTION: COUNT:",
-        state.quiz.ignoredQuestionsCount,
-        "/",
-        state.quiz.templateQuestionsCount,
-        " | ",
-        state.quiz.ignoredQuestionsCount + state.quiz.questions.length
-      );
-      // if all questions are ignored, trigger error message
       // if error message, stop loading
       return {
         ...state,
@@ -274,7 +265,8 @@ export const quizReducer = (
               state.quiz.templateQuestionsCount + 1
             ? false
             : state.loading,
-      };
+      }; // if all questions are ignored OR last question is being ignored, set loading as false
+      // to know total questions: ignored questions + valid questions
     }
     case RUN_FLAGS: {
       console.log("REDUCER - RUN_FLAGS: ");
