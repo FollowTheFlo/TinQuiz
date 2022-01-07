@@ -1,5 +1,12 @@
 import { ofType, Epic } from "redux-observable";
-import { map, tap, concatMap } from "rxjs/operators";
+import {
+  map,
+  tap,
+  concatMap,
+  mergeMap,
+  takeWhile,
+  switchMap,
+} from "rxjs/operators";
 import ActionCreators, { Action } from "../actions";
 import {
   RUN_QUESTION,
@@ -11,7 +18,6 @@ import {
   Theme,
   LAUNCH_QUIZ,
   FILL_DISTRACTOR,
-  COUNT_EXPECTED_QUESTIONS_LIST,
 } from "../constants";
 import {
   RunQuestionAction,
@@ -20,13 +26,9 @@ import {
   RunQuestionsListAction,
   LaunchQuizAction,
 } from "../actions/quizActions";
-import {
-  getSparqlCountryList,
-  getSparqlPlaceList,
-  getSparqlRegionList,
-} from "../shared/services/distractorSPARQL";
+import { getSparqlCountryList } from "../shared/services/distractorSPARQL";
 import { questionAllList } from "../shared/config/queriesLists";
-import { from, of } from "rxjs";
+import { interval, of } from "rxjs";
 import { getSparqlChoice, Article } from "../shared/services/questionSPARQL";
 import { getSparqlFilmChoice } from "../shared/services/filmSPARQL";
 import { Question } from "../reducers/QuizReducer";
@@ -126,7 +128,6 @@ interface localQuestionParams extends QuestionParams {
 }
 
 export const questionEpic: Epic<Action> = (action$, state$) => {
-  let inputEl: any;
   let actionParams: localQuestionParams;
 
   // from question template -> pick one random distractor -> fill with data from WikiData server -> add in on Question List state
@@ -134,7 +135,7 @@ export const questionEpic: Epic<Action> = (action$, state$) => {
     ofType<any>(RUN_QUESTION),
     tap(() => console.log("EPIC - RUN_QUESTION")),
 
-    concatMap((action: RunQuestionAction) => {
+    mergeMap((action: RunQuestionAction) => {
       const randomIndex = randomIntFromInterval(
         0, //list of distractor countries in  quiz.distractor.country[]
         state$.value.quiz.quiz.distractor[action.params.type].length - 1
@@ -251,7 +252,9 @@ export const runQuestionListEpic: Epic<Action> = (action$, state$) => {
   return action$.pipe(
     ofType<any>(RUN_QUESTIONS_LIST),
     tap(() => console.log("EPIC - RUN_QUESTIONS_LIST")),
-    concatMap((action: RunQuestionsListAction) => {
+    // with switchMap the new arriving QuestionsList will cancel the one in progress.
+    // this scenario should never happen as on UI no button launch quiz visible while a quiz is loading.
+    switchMap((action: RunQuestionsListAction) => {
       console.log(action.params.theme);
       let questionListwithTheme: any[];
       switch (action.params.theme) {
@@ -283,20 +286,19 @@ export const runQuestionListEpic: Epic<Action> = (action$, state$) => {
           questionListwithTheme = randomizeChoices(questionAllList);
         }
       }
-      // we stringify to take advantage of rxJS opeator 'from' which accept string only (not objects like QuestionParams)
-      const questionsJSON: string[] = questionListwithTheme.map((q) =>
-        JSON.stringify(q)
+
+      // manage the stream with one question processed every 50 millisec
+      return interval(50).pipe(
+        takeWhile((i) => i < questionListwithTheme.length),
+        map((index) => {
+          return questionListwithTheme[index];
+        })
       );
-      console.log("questionsJSON", questionsJSON);
-      return from(questionsJSON); // question stream one after the other thx to concatMap opeator
     }),
-    //  delay(1000),
-    map((questionJSON: any) => {
-      // Parse to get the object QuestionParams from Json string
-      const questionParams: QuestionParams = JSON.parse(questionJSON);
-      console.log("questionParams", questionParams);
-      //runQuetions action 1 by 1 (due to from()operator) until end of list
-      return ActionCreators.quizActions.runQuestion(questionParams);
+    map((question: QuestionParams) => {
+      // receiving question one by one from Interval Observable subscription
+      console.log("questionParams", question);
+      return ActionCreators.quizActions.runQuestion(question);
     })
   );
 };
