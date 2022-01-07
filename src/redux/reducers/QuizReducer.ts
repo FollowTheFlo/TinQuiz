@@ -245,7 +245,14 @@ export const quizReducer = (
       };
     }
     case IGNORE_QUESTION: {
-      console.log("REDUCER - IGNORE_QUESTION: ");
+      console.log(
+        "REDUCER - IGNORE_QUESTION: COUNT:",
+        state.quiz.ignoredQuestionsCount,
+        "/",
+        state.quiz.templateQuestionsCount,
+        " | ",
+        state.quiz.ignoredQuestionsCount + state.quiz.questions.length
+      );
       // if all questions are ignored, trigger error message
       // if error message, stop loading
       return {
@@ -262,6 +269,9 @@ export const quizReducer = (
         loading:
           state.quiz.ignoredQuestionsCount + 1 ===
           state.quiz.templateQuestionsCount
+            ? false
+            : state.quiz.ignoredQuestionsCount + state.quiz.questions.length ===
+              state.quiz.templateQuestionsCount + 1
             ? false
             : state.loading,
       };
