@@ -10,10 +10,11 @@ import {
   IonTabs,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { home, time, ribbon } from "ionicons/icons";
+import { home, time, ribbon, carSport } from "ionicons/icons";
 import Home from "./pages/Home";
 import History from "./pages/History";
 import Badges from "./pages/Badges";
+import Cars from "./pages/Cars";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -49,6 +50,7 @@ const App: React.FC = () => {
               <Route path="/home" component={Home} exact={true} />
               <Route path="/history" component={History} exact={true} />
               <Route path="/badges" component={Badges} />
+              <Route path="/cars" component={Cars} />
               <Route
                 path="/"
                 render={() => <Redirect to="/home" />}
@@ -89,6 +91,10 @@ const App: React.FC = () => {
               <IonTabButton tab="badges" href="/badges" class="tabButtonStyle">
                 <IonIcon icon={ribbon} />
                 <IonLabel>Badges</IonLabel>
+              </IonTabButton>
+              <IonTabButton tab="cars" href="/cars" class="tabButtonStyle">
+                <IonIcon icon={carSport} />
+                <IonLabel>Cars</IonLabel>
               </IonTabButton>
             </IonTabBar>
           </IonTabs>

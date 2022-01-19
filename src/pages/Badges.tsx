@@ -5,15 +5,12 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
-  IonCol,
   IonGrid,
 } from "@ionic/react";
 import "./Badges.css";
 import { RootState } from "../redux/reducers";
 import { useSelector, useDispatch } from "react-redux";
-import { Badge } from "../redux/reducers/UquizReducer";
 import ActionCreators from "../redux/actions";
-import BadgeElement from "../components/BadgeElement";
 import { Theme } from "../redux/constants";
 import BadgesSegments from "../components/BadgesSegment";
 import BadgesList from "../components/BadgesList";
