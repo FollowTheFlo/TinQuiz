@@ -56,7 +56,7 @@ const Cars: React.FC = () => {
     console.log("In useEffect");
   }, [carsList]);
 
-  /////// Car CRUD ///////
+  /////// Car CRUD and businness logic///////
   const removeCar = (id: string) => {
     setCarsList((currentList) => {
       // use the currentList given by setState Action fct to make sure we have the newest version
@@ -154,7 +154,7 @@ const Cars: React.FC = () => {
     const name = userName;
     setLoading(true);
     console.log("upload");
-    fetch("http://localhost:3002/cars/upload", {
+    fetch("https://route-magnet.herokuapp.com/cars/upload", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userName: name, cars: payload }),
@@ -179,7 +179,7 @@ const Cars: React.FC = () => {
   const download = (name: string) => {
     console.log("download");
     setLoading(true);
-    fetch(`http://localhost:3002/cars/download/${name}`)
+    fetch(`https://route-magnet.herokuapp.com/cars/download/${name}`)
       .then((res) => res.json())
       .then(
         (result: DTO) => {
