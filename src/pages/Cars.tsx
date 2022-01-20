@@ -159,10 +159,17 @@ const Cars: React.FC = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userName: name, cars: payload }),
     })
-      .then((res) => res.json())
       .then(
-        (result: DTO) => {
+        (res) => res.json(),
+        (error) => console.log("error1", error)
+      )
+      .then(
+        (result: any) => {
           setLoading(false);
+          if (result["error"]) {
+            setError(result["message"] ?? `Error downloading data for ${name}`);
+            return;
+          }
           console.log("result");
           if (!result?.cars) return;
           setCarsList(result.cars);
@@ -170,7 +177,7 @@ const Cars: React.FC = () => {
 
         (error) => {
           setLoading(false);
-          console.log("error");
+          console.log("error", error);
           setError(error["message"] ?? `Error uploading data for ${name}`);
         }
       );
@@ -180,17 +187,26 @@ const Cars: React.FC = () => {
     console.log("download");
     setLoading(true);
     fetch(`https://route-magnet.herokuapp.com/cars/download/${name}`)
-      .then((res) => res.json())
       .then(
-        (result: DTO) => {
+        (res) => res.json(),
+        (error) => console.log("error1", error)
+      )
+      .then(
+        (result: any) => {
           setLoading(false);
+          console.log("result", result);
+          // if error, object shape is {error,message,statusCode}
+          if (result["error"]) {
+            setError(result["message"] ?? `Error downloading data for ${name}`);
+            return;
+          }
+
           setCarsList(result.cars);
-          console.log("result");
         },
 
         (error) => {
           setLoading(false);
-          console.log("error");
+          console.log("error", error);
           setError(error["message"] ?? `Error downloading data for ${name}`);
         }
       );
